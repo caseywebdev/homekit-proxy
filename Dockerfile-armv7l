@@ -31,7 +31,7 @@ RUN npm install --no-save
 COPY bin /code/bin
 COPY src /code/src
 
-ENV LD_LIBRARY_PATH /usr/local/lib64
+ENV LD_LIBRARY_PATH /usr/local/lib
 
 ENTRYPOINT
 
