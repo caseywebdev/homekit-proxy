@@ -4,7 +4,7 @@ set -e
 
 if [ `which docker` ]; then
   NAME=`jq -r .name config.json`
-  if [ NAME = 'null' ]; then NAME='homekit-proxy'; fi
+  if [ $NAME == 'null' ]; then NAME='homekit-proxy'; fi
 
   docker build --file Dockerfile-`uname -m` --tag $NAME .
 
