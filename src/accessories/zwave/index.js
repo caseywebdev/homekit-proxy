@@ -29,7 +29,8 @@ module.exports = class extends Base {
         nodes[nodeId] &&
         nodes[nodeId].classes &&
         nodes[nodeId].classes[commandClass] &&
-        nodes[nodeId].classes[commandClass][index];
+        nodes[nodeId].classes[commandClass][index] &&
+        nodes[nodeId].classes[commandClass][index].value;
 
       char.updateValue(getValue());
 
@@ -39,7 +40,7 @@ module.exports = class extends Base {
           cb(null, getValue());
         });
 
-        client.on(`${nodeId}:${commandClass}:${index}:value`, value => {
+        client.on(`${nodeId}:${commandClass}:${index}:value`, ({value}) => {
           char.updateValue(value);
         });
       }
