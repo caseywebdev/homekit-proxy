@@ -11,6 +11,7 @@ module.exports = ({device, networkKey: NetworkKey}) => {
   const nodes = {};
 
   client.on('node ready', (nodeId, node) => {
+    console.log(node);
     nodes[nodeId] = node;
     for (let commandClass in node.classes) {
       const values = node.classes[commandClass];
@@ -21,7 +22,11 @@ module.exports = ({device, networkKey: NetworkKey}) => {
   });
 
   client.on('value changed', (nodeId, commandClass, value) => {
-    nodes[nodeId].classes[commandClass][value.index] = value;
+    console.log(value);
+    const node = nodes[nodeId];
+    if (!node) return;
+
+    node.classes[commandClass][value.index] = value;
     client.emit(`${nodeId}:${commandClass}:${value.index}:value`, value);
   });
 
