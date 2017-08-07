@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ `which docker` ]; then
+  NAME=`jq -r .name config.json`
+  if [ NAME = 'null' ]; then NAME='homekit-proxy'; fi
+
+  docker build --file Dockerfile-`uname -m` --tag $NAME .
+
+  set +e
+  docker stop $NAME 2>/dev/null
+  docker rm -f $NAME 2>/dev/null
+  set -e
+
+  exec docker run \
+    --detach \
+    `jq -r '.devices[]? | "--device " + . + ":" + .' config.json` \
+    --name $NAME \
+    --network host \
+    --restart always \
+    --volume `pwd`/config.json:/code/config.json \
+    --volume `pwd`/persist:/code/persist \
+    $NAME
+else
+  rm -fr /var/run/dbus/pid /var/run/avahi-daemon/pid
+
+  dbus-daemon --system
+
+  avahi-daemon -D
+
+  exec node src
+fi

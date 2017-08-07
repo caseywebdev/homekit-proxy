@@ -1,0 +1,9 @@
+{
+  "private": true,
+  "dependencies": {
+    "hap-nodejs": "0.4.27",
+    "node-fetch": "1.7.1",
+    "openzwave-shared": "1.4.0",
+    "underscore": "1.8.3"
+  }
+}

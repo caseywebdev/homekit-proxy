@@ -1,0 +1,37 @@
+FROM resin/rpi-raspbian
+
+RUN apt-get update && \
+    apt-get install -y \
+      curl \
+      g++ \
+      libavahi-compat-libdnssd-dev \
+      libudev-dev \
+      make && \
+    curl -fLsS https://deb.nodesource.com/setup_8.x | bash - && \
+    apt-get install -y nodejs && \
+    mkdir /usr/local/src/open-zwave && \
+    curl -fLsS \
+      https://api.github.com/repos/OpenZWave/open-zwave/tarball/master | \
+      tar xz -C /usr/local/src/open-zwave --strip-components 1 && \
+    cd /usr/local/src/open-zwave && \
+    make && \
+    make install && \
+    mkdir -p /var/run/dbus && \
+    sed -i \
+      -e 's/#enable-dbus=yes/enable-dbus=yes/' \
+      -e 's/rlimit-nproc=3/#rlimit-nproc=3/' \
+      /etc/avahi/avahi-daemon.conf
+
+WORKDIR /code
+
+COPY package.json /code/package.json
+RUN npm install --no-save
+
+COPY bin /code/bin
+COPY src /code/src
+
+ENV LD_LIBRARY_PATH /usr/local/lib64
+
+ENTRYPOINT
+
+CMD ["bin/run"]
