@@ -8,28 +8,18 @@ module.exports = ({device, networkKey: NetworkKey}) => {
   if (zwave) return zwave;
 
   const client = new OZW({Logging: false, ConsoleOutput: true, NetworkKey});
-  const nodes = {};
-
-  client.on('node ready', (nodeId, node) => {
-    nodes[nodeId] = node;
-    for (let commandClass in node.classes) {
-      const values = node.classes[commandClass];
-      for (let index in values) {
-        client.emit(`${nodeId}:${commandClass}:${index}:value`, values[index]);
-      }
-    }
-  });
-
-  client.on('value changed', (nodeId, commandClass, value) => {
-    const node = nodes[nodeId];
-    if (!node) return;
-
-    node.classes[commandClass][value.index] = value;
-    client.emit(`${nodeId}:${commandClass}:${value.index}:value`, value);
-  });
-
-  client.connect(device);
-  return byDevice[device] = {client, nodes};
+  const values = {};
+  const setValue = (nodeId, commandClass, {instance, index, value}) => {
+    const key = [nodeId, commandClass, instance, index].join('-');
+    values[key] = value;
+    console.log(key, '=', value);
+    client.emit(`value:${key}`, value);
+  };
+  client
+    .on('value added', setValue)
+    .on('value changed', setValue)
+    .connect(device);
+  return byDevice[device] = {client, values};
 };
 
 process.on('SIGTERM', () => {

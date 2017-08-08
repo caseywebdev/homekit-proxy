@@ -7,7 +7,7 @@ module.exports = class extends Base {
   constructor(options) {
     super(options);
 
-    const {client, nodes} = getZwave(options);
+    const {client, values} = getZwave(options);
     const {name, nodeId, type} = options;
     const {Service, characteristics} = types[type];
     const service = new Service(name);
@@ -25,30 +25,30 @@ module.exports = class extends Base {
         console.log(`${name} ${cname} changed from ${oldValue} to ${newValue}`)
       );
 
-      const getValue = () =>
-        nodes[nodeId] &&
-        nodes[nodeId].classes &&
-        nodes[nodeId].classes[commandClass] &&
-        nodes[nodeId].classes[commandClass][index] &&
-        nodes[nodeId].classes[commandClass][index].value;
-
-      char.updateValue(getValue());
+      const key = [nodeId, commandClass, instance, index].join('-');
+      char.updateValue(values[key]);
 
       if (!isTarget) {
         char.on('get', cb => {
-          client.refreshValue(nodeId, commandClass, instance, index);
-          cb(null, getValue());
+          try {
+            client.refreshValue(nodeId, commandClass, instance, index);
+            cb(null, values[key]);
+          } catch (er) {
+            cb(er);
+          }
         });
 
-        client.on(`${nodeId}:${commandClass}:${index}:value`, ({value}) => {
-          char.updateValue(value);
-        });
+        client.on(`value:${key}`, ({value}) => char.updateValue(value));
       }
 
       if (!hasTarget) {
         char.on('set', (value, cb) => {
-          client.setValue(nodeId, commandClass, instance, index, value);
-          cb();
+          try {
+            client.setValue(nodeId, commandClass, instance, index, value);
+            cb();
+          } catch (er) {
+            cb(er);
+          }
         });
       }
     });
