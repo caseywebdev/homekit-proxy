@@ -16,6 +16,7 @@ module.exports = class extends BaseAccessory {
     this.category = BaseAccessory.Categories.GARAGE_DOOR_OPENER;
 
     this.api = new Api(options);
+    this.name = options.name;
 
     this.apiToHap = {
       1: CurrentDoorState.OPEN,
@@ -80,7 +81,7 @@ module.exports = class extends BaseAccessory {
   logChange(name, {oldValue, newValue}) {
     const from = this.hapToEnglish[oldValue];
     const to = this.hapToEnglish[newValue];
-    console.log(`${name} changed from ${from} to ${to}`);
+    console.log(`[${this.name}] ${name}: ${from} -> ${to}`);
 
     if (name === 'doorstate') {
       this.reactiveSetTargetDoorState = true;

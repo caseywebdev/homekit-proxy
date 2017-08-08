@@ -7,48 +7,45 @@ module.exports = class extends Base {
   constructor(options) {
     super(options);
 
-    const {client, values} = getZwave(options);
+    const {client, refreshValue, setValue, values} = getZwave(options);
     const {name, nodeId, type} = options;
     const {Service, characteristics} = types[type];
     const service = new Service(name);
     _.each(characteristics, ({
       cid,
+      classId,
       cname,
-      commandClass,
+      hasTarget = false,
       index = 0,
       instance = 1,
       isTarget = false,
-      hasTarget = false
+      toHap = _.identity,
+      toZwave = _.identity
     }) => {
       const char = service.getCharacteristic(cid);
+      const key = [nodeId, classId, instance, index].join('-');
+      const value = values[key];
       char.on('change', ({oldValue, newValue}) =>
-        console.log(`${name} ${cname} changed from ${oldValue} to ${newValue}`)
+        console.log(`[${name}] ${cname}: ${oldValue} -> ${newValue}`)
       );
+      if (value != null) char.updateValue(toHap(value));
 
-      const key = [nodeId, commandClass, instance, index].join('-');
-      char.updateValue(values[key]);
+      client.on(`value:${key}`, value => char.updateValue(toHap(value)));
 
       if (!isTarget) {
         char.on('get', cb => {
-          try {
-            client.refreshValue(nodeId, commandClass, instance, index);
-            cb(null, values[key]);
-          } catch (er) {
-            cb(er);
-          }
-        });
+          refreshValue(key);
+          const value = values[key];
+          if (value == null) return cb(new Error('Unknown value!'));
 
-        client.on(`value:${key}`, ({value}) => char.updateValue(value));
+          cb(null, toHap(value));
+        });
       }
 
       if (!hasTarget) {
         char.on('set', (value, cb) => {
-          try {
-            client.setValue(nodeId, commandClass, instance, index, value);
-            cb();
-          } catch (er) {
-            cb(er);
-          }
+          setValue(key, toZwave(value), isTarget ? _.noop : cb);
+          if (isTarget) cb();
         });
       }
     });

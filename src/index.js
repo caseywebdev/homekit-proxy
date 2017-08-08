@@ -1,8 +1,9 @@
 const _ = require('underscore');
-const {init, uuid} = require('hap-nodejs');
 const {accessories, includes, pincode, port = 8000} = require('../config');
+const {init, uuid} = require('hap-nodejs');
+const path = require('path');
 
-init('persist');
+init(path.resolve('persist'));
 
 const toUsername = name =>
   _.chain(uuid.generate(name).replace(/-/g, ''))

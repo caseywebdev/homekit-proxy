@@ -16,43 +16,53 @@ const {
 } = require('hap-nodejs');
 
 module.exports = {
-  fan: {
+  'multilevel-fan': {
     Service: Fan,
     characteristics: [
       {
         cid: On,
         cname: 'power',
-        commandClass: 37
+        classId: 0x26,
+        toHap: n => n ? 1 : 0,
+        toZwave: n => n ? 99 : 0
       },
       {
         cid: RotationSpeed,
         cname: 'speed',
-        commandClass: 38
+        classId: 0x26,
+        toHap: n => Math.floor(n / 99 * 100),
+        toZwave: n => Math.ceil(n / 100 * 99)
       }
     ]
   },
-  light: {
+  'binary-light': {
     Service: Lightbulb,
     characteristics: [
       {
         cid: On,
         cname: 'power',
-        commandClass: 0x25
+        classId: 0x25,
+        toHap: n => n ? 1 : 0,
+        toZwave: n => !!n
       }
     ]
   },
-  dimmableLight: {
+  'multilevel-light': {
     Service: Lightbulb,
     characteristics: [
       {
         cid: On,
         cname: 'power',
-        commandClass: 0x25
+        classId: 0x26,
+        toHap: n => n ? 1 : 0,
+        toZwave: n => n ? 99 : 0
       },
       {
         cid: Brightness,
         cname: 'brightness',
-        commandClass: 0x26
+        classId: 0x26,
+        toHap: n => Math.floor(n / 99 * 100),
+        toZwave: n => Math.ceil(n / 100 * 99)
       }
     ]
   },
@@ -62,14 +72,18 @@ module.exports = {
       {
         cid: LockCurrentState,
         cname: 'state',
-        commandClass: 0x76,
-        hasTarget: true
+        classId: 0x62,
+        hasTarget: true,
+        toHap: n => n ? LockTargetState.SECURED : LockTargetState.UNSECURED,
+        toZwave: n => n === LockTargetState.SECURED ? true : false
       },
       {
         cid: LockTargetState,
         cname: 'target state',
-        commandClass: 0x76,
-        isTarget: true
+        classId: 0x62,
+        isTarget: true,
+        toHap: n => n ? LockTargetState.SECURED : LockTargetState.UNSECURED,
+        toZwave: n => n === LockTargetState.SECURED ? true : false
       }
     ]
   },
@@ -79,7 +93,7 @@ module.exports = {
       {
         cid: BatteryLevel,
         cname: 'level',
-        commandClass: 0x80
+        classId: 0x80
       }
     ]
   }
