@@ -1,10 +1,10 @@
 const _ = require('underscore');
-const {port = 10000} = require('../../../config');
+const {accessories, port = 10000} = require('../../../config');
 const Discover = require('harmonyhubjs-discover');
 const getClient = require('harmonyhubjs-client');
 
 let hubs = [];
-const discover = new Discover(port);
+const discover = new Discover(port + _.size(accessories));
 discover.on('update', _hubs => hubs = _hubs);
 discover.start();
 
