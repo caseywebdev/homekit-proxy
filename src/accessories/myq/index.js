@@ -1,5 +1,6 @@
 const _ = require('underscore');
 const {
+  Accessory: {Categories: {GARAGE_DOOR_OPENER}},
   Characteristic: {CurrentDoorState, TargetDoorState},
   Service: {GarageDoorOpener}
 } = require('hap-nodejs');
@@ -13,7 +14,7 @@ module.exports = class extends BaseAccessory {
   constructor(options) {
     super(options);
 
-    this.category = BaseAccessory.Categories.GARAGE_DOOR_OPENER;
+    this.category = GARAGE_DOOR_OPENER;
 
     this.api = new Api(options);
     this.name = options.name;

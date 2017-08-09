@@ -1,5 +1,5 @@
 const _ = require('underscore');
-const {accessories, includes, pincode, port = 8000} = require('../config');
+const {accessories, includes, pincode, port = 10000} = require('../config');
 const {init, uuid} = require('hap-nodejs');
 const path = require('path');
 

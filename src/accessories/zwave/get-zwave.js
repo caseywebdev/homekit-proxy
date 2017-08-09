@@ -35,8 +35,6 @@ module.exports = ({device, networkKey: NetworkKey}) => {
     (pending[nodeId] || (pending[nodeId] = {}))[key] = value;
   };
 
-  const getCbQueue = _.memoize(() => []);
-
   const getValueId = key => {
     const n = _.map(key.split('-'), n => parseInt(n));
     return {node_id: n[0], class_id: n[1], instance: n[2], index: n[3]};
@@ -46,15 +44,11 @@ module.exports = ({device, networkKey: NetworkKey}) => {
     let handler = _.noop;
     let checkTimeoutId;
     const event = `value:${key}`;
-    const cbs = getCbQueue(key);
     return _.debounce(value => {
       const done = _.once(er => {
         client.removeListener(event, handler);
         clearTimeout(checkTimeoutId);
         if (er) console.error(er);
-        const clone = cbs.slice();
-        cbs.length = 0;
-        return _.each(clone, cb => cb(er));
       });
 
       client.removeListener(event, handler);
@@ -86,10 +80,7 @@ module.exports = ({device, networkKey: NetworkKey}) => {
     }, DEBOUNCE_WAIT);
   });
 
-  const setValue = (key, value, cb) => {
-    getCbQueue(key).push(cb);
-    getValueSetter(key)(value);
-  };
+  const setValue = (key, value) => getValueSetter(key)(value);
 
   const getValueRefresher = _.memoize(key =>
     _.debounce(() => {

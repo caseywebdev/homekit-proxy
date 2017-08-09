@@ -1,4 +1,12 @@
 const {
+  Accessory: {
+    Category: {
+      FAN,
+      LIGHTBULB,
+      DOOR_LOCK,
+      SENSOR
+    }
+  },
   Characteristic: {
     BatteryLevel,
     Brightness,
@@ -17,6 +25,7 @@ const {
 
 module.exports = {
   'multilevel-fan': {
+    category: FAN,
     Service: Fan,
     characteristics: [
       {
@@ -36,6 +45,7 @@ module.exports = {
     ]
   },
   'binary-light': {
+    category: LIGHTBULB,
     Service: Lightbulb,
     characteristics: [
       {
@@ -48,6 +58,7 @@ module.exports = {
     ]
   },
   'multilevel-light': {
+    category: LIGHTBULB,
     Service: Lightbulb,
     characteristics: [
       {
@@ -67,6 +78,7 @@ module.exports = {
     ]
   },
   lock: {
+    category: DOOR_LOCK,
     Service: LockMechanism,
     characteristics: [
       {
@@ -88,6 +100,7 @@ module.exports = {
     ]
   },
   battery: {
+    category: SENSOR,
     Service: BatteryService,
     characteristics: [
       {

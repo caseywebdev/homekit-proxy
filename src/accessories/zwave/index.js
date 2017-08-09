@@ -9,7 +9,8 @@ module.exports = class extends Base {
 
     const {client, refreshValue, setValue, values} = getZwave(options);
     const {name, nodeId, type} = options;
-    const {Service, characteristics} = types[type];
+    const {category, characteristics, Service} = types[type];
+    this.category = category;
     const service = new Service(name);
     _.each(characteristics, ({
       cid,
@@ -44,8 +45,8 @@ module.exports = class extends Base {
 
       if (!hasTarget) {
         char.on('set', (value, cb) => {
-          setValue(key, toZwave(value), isTarget ? _.noop : cb);
-          if (isTarget) cb();
+          setValue(key, toZwave(value));
+          cb();
         });
       }
     });
