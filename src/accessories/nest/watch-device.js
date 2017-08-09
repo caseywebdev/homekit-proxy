@@ -32,7 +32,7 @@ const clients = {};
 process.on('SIGTERM', () => _.invoke(_.map(clients, 'source'), 'close'));
 
 module.exports = ({cb, deviceName, token}) => {
-  const client = clients[token] || (clients[token] = createSource[token]);
+  const client = clients[token] || (clients[token] = createSource(token));
   if (client.devices[deviceName]) cb(client.devices[deviceName]);
   if (!client.cbs[deviceName]) client.cbs[deviceName] = [];
   client.cbs[deviceName].push(cb);
