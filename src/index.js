@@ -23,5 +23,10 @@ _.each(_.pairs(accessories), ([name, typeOptions], i) => {
     _.omit(options, '$include'),
     {name}
   ));
-  accessory.publish({username: toUsername(name), pincode, port: port + i});
+  accessory.publish({
+    category: accessory.category,
+    pincode,
+    port: port + i,
+    username: toUsername(name)
+  });
 });
