@@ -5,6 +5,7 @@ RUN apt-get update && \
       avahi-daemon \
       curl \
       g++ \
+      git \
       libavahi-compat-libdnssd-dev \
       libudev-dev \
       make && \
