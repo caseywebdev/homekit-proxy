@@ -46,9 +46,9 @@ module.exports = class extends Base {
         try {
           const {activity, client, isOn} = await getState();
           if (turnOn && !isOn) {
-            client.startActivity(activity.id).catch(er => log.error(er));
+            client.startActivity(activity.id).catch(log.error);
           } else if (!turnOn && isOn) {
-            client.turnOff().catch(er => log.error(er));
+            client.turnOff().catch(log.error);
           }
           cb();
         } catch (er) {

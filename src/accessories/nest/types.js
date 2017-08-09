@@ -33,12 +33,16 @@ const {
 const isDetected = ({
   device: {
     activity_zones,
+    away,
+    device_group,
     last_event,
-    last_event: {activity_zone_ids, end_time}
+    last_event: {activity_zone_ids, end_time} = {}
   },
   type,
   options: {activityZones}
 }) =>
+  device_group === 'structures' ?
+  away === 'home' :
   last_event[`has_${type}`] &&
   !end_time && (
     !activityZones ||
