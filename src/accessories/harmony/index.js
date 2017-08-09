@@ -45,9 +45,9 @@ module.exports = class extends Base {
           const client = await getClient(hubName);
           if (value) {
             const activity = await getActivity(client);
-            await client.startActivity(activity.id);
+            client.startActivity(activity.id).catch(er => console.error(er));
           } else {
-            await client.turnOff();
+            client.turnOff().catch(er => console.error(er));
           }
           await client.end();
           cb();
