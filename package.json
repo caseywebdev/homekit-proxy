@@ -3,7 +3,7 @@
   "dependencies": {
     "hap-nodejs": "0.4.27",
     "harmonyhubjs-client": "1.1.10",
-    "harmonyhubjs-discover": "1.0.2",
+    "harmonyhubjs-discover": "1.0.3",
     "node-fetch": "1.7.2",
     "openzwave-shared": "1.4.0",
     "underscore": "1.8.3"
