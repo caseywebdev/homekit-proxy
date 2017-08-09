@@ -1,6 +1,7 @@
 {
   "private": true,
   "dependencies": {
+    "eventsource": "1.0.5",
     "hap-nodejs": "0.4.27",
     "harmonyhubjs-client": "1.1.10",
     "harmonyhubjs-discover": "1.0.3",
