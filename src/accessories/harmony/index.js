@@ -14,11 +14,13 @@ module.exports = class extends Base {
     this.category = SWITCH;
     const {activityName: label, hubName, name} = options;
 
-    const getActivity = async client => {
+    const getState = async () => {
+      const client = await getClient(hubName);
       const activity = _.find(await client.getActivities(), {label});
       if (!activity) throw new Error(`Harmony Activity ${label} not found`);
 
-      return activity;
+      const isOn = activity.id === await client.getCurrentActivity();
+      return {activity, client, isOn};
     };
 
     const service = new Switch(name);
@@ -30,23 +32,20 @@ module.exports = class extends Base {
       )
       .on('get', async cb => {
         try {
-          const client = await getClient(hubName);
-          const activity = await getActivity(client);
-          const activityId = await client.getCurrentActivity();
+          const {client, isOn} = await getState();
           await client.end();
-          cb(null, activity.id === activityId);
+          cb(null, isOn);
         } catch (er) {
           console.error(er);
           cb(er);
         }
       })
-      .on('set', async (value, cb) => {
+      .on('set', async (turnOn, cb) => {
         try {
-          const client = await getClient(hubName);
-          if (value) {
-            const activity = await getActivity(client);
+          const {activity, client, isOn} = await getState();
+          if (turnOn && !isOn) {
             client.startActivity(activity.id).catch(er => console.error(er));
-          } else {
+          } else if (!turnOn && isOn) {
             client.turnOff().catch(er => console.error(er));
           }
           await client.end();

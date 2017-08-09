@@ -1,6 +1,6 @@
 const {
   Accessory: {
-    Category: {
+    Categories: {
       FAN,
       LIGHTBULB,
       DOOR_LOCK,
