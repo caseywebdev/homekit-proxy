@@ -16,7 +16,9 @@ module.exports = class extends Base {
 
     const getState = async () => {
       const client = await getClient(hubName);
-      const activity = _.find(await client.getActivities(), {label});
+      let {activities} = client;
+      if (!activities) activities = client.activities = client.getActivities();
+      const activity = _.find(await activities, {label});
       if (!activity) throw new Error(`Harmony Activity ${label} not found`);
 
       const isOn = activity.id === await client.getCurrentActivity();
@@ -32,9 +34,7 @@ module.exports = class extends Base {
       )
       .on('get', async cb => {
         try {
-          const {client, isOn} = await getState();
-          await client.end();
-          cb(null, isOn);
+          cb(null, (await getState()).isOn);
         } catch (er) {
           console.error(er);
           cb(er);
@@ -48,7 +48,6 @@ module.exports = class extends Base {
           } else if (!turnOn && isOn) {
             client.turnOff().catch(er => console.error(er));
           }
-          await client.end();
           cb();
         } catch (er) {
           console.error(er);

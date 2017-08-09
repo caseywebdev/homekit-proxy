@@ -10,11 +10,19 @@ discover.start();
 
 process.on('SIGTERM', () => discover.stop());
 
+const clients = {};
+
 module.exports = async friendlyName => {
   if (!hubs.length) throw new Error('No Harmony Hubs found');
 
   const hub = friendlyName ? _.find(hubs, {friendlyName}) : hubs[0];
   if (!hub) throw new Error(`Harmony Hub ${friendlyName} not found`);
 
-  return getClient(hub.ip);
+  const {ip} = hub;
+  let client = clients[ip];
+  if (client) return client;
+
+  client = await (clients[ip] = getClient(ip));
+  client._xmppClient.on('offline', () => delete clients[ip]);
+  return client;
 };
