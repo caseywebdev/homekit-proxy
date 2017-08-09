@@ -1,4 +1,5 @@
 const _ = require('underscore');
+const log = require('../../utils/log');
 const OZW = require('openzwave-shared');
 
 const CHECK_INTERVAL = 1000;
@@ -48,7 +49,7 @@ module.exports = ({device, networkKey: NetworkKey}) => {
       const done = _.once(er => {
         client.removeListener(event, handler);
         clearTimeout(checkTimeoutId);
-        if (er) console.error(er);
+        if (er) log.error(er);
       });
 
       client.removeListener(event, handler);
@@ -90,7 +91,7 @@ module.exports = ({device, networkKey: NetworkKey}) => {
       try {
         client.refreshValue(getValueId(key));
       } catch (er) {
-        console.error(er);
+        log.error(er);
       }
     }, DEBOUNCE_WAIT)
   );

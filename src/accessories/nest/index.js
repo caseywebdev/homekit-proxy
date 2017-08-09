@@ -1,5 +1,6 @@
 const _ = require('underscore');
 const Base = require('../base');
+const log = require('../../utils/log');
 const types = require('./types');
 const updateDevice = require('./update-device');
 const watchDevice = require('./watch-device');
@@ -19,7 +20,7 @@ module.exports = class extends Base {
       const char = service.getCharacteristic(cid);
 
       char.on('change', ({oldValue, newValue}) =>
-        console.log(`[${name}] ${cname}: ${oldValue} -> ${newValue}`)
+        log.info(`[${name}] ${cname}: ${oldValue} -> ${newValue}`)
       );
 
       if (toHap) {
@@ -40,7 +41,7 @@ module.exports = class extends Base {
 
             await updateDevice({body: toNest(value), device, token});
           } catch (er) {
-            console.error(er);
+            log.error(er);
           }
         }, DEBOUNCE_WAIT);
 
@@ -49,7 +50,7 @@ module.exports = class extends Base {
             update(value);
             cb();
           } catch (er) {
-            console.error(er);
+            log.error(er);
             cb(er);
           }
         });

@@ -19,6 +19,7 @@ if [ `which docker` ]; then
     --name $NAME \
     --network host \
     --restart always \
+    --volume /etc/localtime:/etc/localtime \
     --volume `pwd`/config.json:/code/config.json \
     --volume `pwd`/persist:/code/persist \
     $NAME

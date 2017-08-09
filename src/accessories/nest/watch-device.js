@@ -1,5 +1,6 @@
 const _ = require('underscore');
 const EventSource = require('eventsource');
+const log = require('../../utils/log');
 
 const DEVICES_URL = 'https://developer-api.nest.com/devices';
 
@@ -16,7 +17,7 @@ const createSource = token => {
       })
     )
   );
-  source.on('error', er => console.error(er));
+  source.on('error', er => log.error(er));
   return {cbs, devices, source};
 };
 

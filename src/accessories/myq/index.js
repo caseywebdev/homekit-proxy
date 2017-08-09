@@ -1,11 +1,13 @@
 const _ = require('underscore');
+const Api = require('./api');
+const BaseAccessory = require('../base');
+const log = require('../../utils/log');
+
 const {
   Accessory: {Categories: {GARAGE_DOOR_OPENER}},
   Characteristic: {CurrentDoorState, TargetDoorState},
   Service: {GarageDoorOpener}
 } = require('hap-nodejs');
-const Api = require('./api');
-const BaseAccessory = require('../base');
 
 const ACTIVE_DELAY = 1000 * 2;
 const IDLE_DELAY = 1000 * 10;
@@ -82,7 +84,7 @@ module.exports = class extends BaseAccessory {
   logChange(name, {oldValue, newValue}) {
     const from = this.hapToEnglish[oldValue];
     const to = this.hapToEnglish[newValue];
-    console.log(`[${this.name}] ${name}: ${from} -> ${to}`);
+    log.info(`[${this.name}] ${name}: ${from} -> ${to}`);
 
     if (name === 'doorstate') {
       this.reactiveSetTargetDoorState = true;
@@ -93,7 +95,7 @@ module.exports = class extends BaseAccessory {
 
   getErrorHandler(cb) {
     return er => {
-      console.error(er);
+      log.error(er);
       cb(er);
     };
   }

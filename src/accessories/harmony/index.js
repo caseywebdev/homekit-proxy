@@ -1,6 +1,8 @@
 const _ = require('underscore');
 const Base = require('../base');
 const getClient = require('./get-client');
+const log = require('../../utils/log');
+
 const {
   Accessory: {Categories: {SWITCH}},
   Characteristic: {On},
@@ -30,13 +32,13 @@ module.exports = class extends Base {
     service
       .getCharacteristic(On)
       .on('change', ({oldValue, newValue}) =>
-        console.log(`[${name}] on: ${oldValue} -> ${newValue}`)
+        log.info(`[${name}] on: ${oldValue} -> ${newValue}`)
       )
       .on('get', async cb => {
         try {
           cb(null, (await getState()).isOn);
         } catch (er) {
-          console.error(er);
+          log.error(er);
           cb(er);
         }
       })
@@ -44,13 +46,13 @@ module.exports = class extends Base {
         try {
           const {activity, client, isOn} = await getState();
           if (turnOn && !isOn) {
-            client.startActivity(activity.id).catch(er => console.error(er));
+            client.startActivity(activity.id).catch(er => log.error(er));
           } else if (!turnOn && isOn) {
-            client.turnOff().catch(er => console.error(er));
+            client.turnOff().catch(er => log.error(er));
           }
           cb();
         } catch (er) {
-          console.error(er);
+          log.error(er);
           cb(er);
         }
       });

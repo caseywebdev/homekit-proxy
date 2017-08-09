@@ -1,6 +1,7 @@
 const _ = require('underscore');
 const Base = require('../base');
 const getZwave = require('./get-zwave');
+const log = require('../../utils/log');
 const types = require('./types');
 
 module.exports = class extends Base {
@@ -27,7 +28,7 @@ module.exports = class extends Base {
       const key = [nodeId, classId, instance, index].join('-');
       const value = values[key];
       char.on('change', ({oldValue, newValue}) =>
-        console.log(`[${name}] ${cname}: ${oldValue} -> ${newValue}`)
+        log.info(`[${name}] ${cname}: ${oldValue} -> ${newValue}`)
       );
       if (value != null) char.updateValue(toHap(value));
 
