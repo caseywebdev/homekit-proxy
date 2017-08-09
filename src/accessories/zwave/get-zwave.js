@@ -57,6 +57,8 @@ module.exports = ({device, networkKey: NetworkKey}) => {
 
       const start = Date.now();
       const check = () => {
+        if (values[key] === value) return done();
+
         if (Date.now() - start > MAX_CHECK_WAIT) {
           return done(new Error(
             `Waited over ${MAX_CHECK_WAIT / 1000}s for ${key} to be set to ` +
@@ -76,7 +78,8 @@ module.exports = ({device, networkKey: NetworkKey}) => {
         return done(er);
       }
 
-      check();
+      clearTimeout(checkTimeoutId);
+      checkTimeoutId = setTimeout(check, CHECK_INTERVAL);
     }, DEBOUNCE_WAIT);
   });
 
