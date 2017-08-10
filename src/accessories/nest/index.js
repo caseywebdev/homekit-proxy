@@ -5,8 +5,6 @@ const types = require('./types');
 const updateDevice = require('./update-device');
 const watchDevice = require('./watch-device');
 
-const DEBOUNCE_WAIT = 1000;
-
 module.exports = class extends Base {
   constructor(options) {
     super(options);
@@ -35,28 +33,16 @@ module.exports = class extends Base {
       }
 
       if (toNest) {
-        let cbs = [];
-        const update = _.debounce(async value => {
-          const done = er => {
-            const _cbs = cbs;
-            cbs = [];
-            _.each(_cbs, cb => cb(er));
-          };
+        char.on('set', async (value, cb) => {
           try {
             if (!device) throw new Error(`Nest Device ${deviceName} not found`);
 
             const body = toNest({device, options, value});
             await updateDevice({body, device, token});
-            done();
+            cb();
           } catch (er) {
-            log.error(er);
-            done(er);
+            cb(er);
           }
-        }, DEBOUNCE_WAIT);
-
-        char.on('set', async (value, cb) => {
-          cbs.push(cb);
-          update(value);
         });
       }
     });
