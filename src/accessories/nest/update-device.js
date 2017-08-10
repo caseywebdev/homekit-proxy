@@ -49,7 +49,7 @@ module.exports = async ({body, device, token}) => {
   if (!waiting) waiting = queue[key] = {body: {}, deferreds: []};
   const {body: _body, deferreds, timeoutId} = waiting;
   const deferred = createDeferred();
-  deferred.push(deferred);
+  deferreds.push(deferred);
   clearTimeout(timeoutId);
   const done = er =>
     _.each(deferreds, ({resolve, reject}) => er ? reject(er) : resolve());

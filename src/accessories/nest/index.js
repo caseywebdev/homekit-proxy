@@ -41,6 +41,7 @@ module.exports = class extends Base {
             await updateDevice({body, device, token});
             cb();
           } catch (er) {
+            console.error(er);
             cb(er);
           }
         });
