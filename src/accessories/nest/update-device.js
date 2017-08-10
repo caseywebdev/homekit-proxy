@@ -7,6 +7,7 @@ const URL = 'https://developer-api.nest.com';
 const urls = {};
 
 const put = async ({body, path, token}) => {
+  return console.log(`Faking: PUT ${(urls[token] || URL) + path} ${JSON.stringify(body)}`);
   const res = await fetch((urls[token] || URL) + path, {
     body: JSON.stringify(body),
     follow: 0,
