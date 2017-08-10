@@ -45,20 +45,19 @@ const put = async ({body, path, token}) => {
 module.exports = async ({body, device, token}) => {
   const {device_group, device_id} = device;
   const key = JSON.stringify([token, device_group, device_id]);
-  let pending = queue[key];
-  if (!pending) pending = queue[key] = {deferreds: []};
-  const {deferreds} = [];
-  const done = (key, er) =>
-    _.each(deferreds, ({resolve, reject}) => er ? reject(er) : resolve());
+  let waiting = queue[key];
+  if (!waiting) waiting = queue[key] = {body: {}, deferreds: []};
+  const {body: _body, deferreds, timeoutId} = waiting;
   const deferred = createDeferred();
-  pending.deferred.push(deferred);
-  clearTimeout(pending.timeoutId);
-  _.extend(pending, {body: _.extend({}, pending.body, body)});
-  const current = _.pick(device, _.keys(pending.body));
-  if (_.isEqual(current, pending.body)) {
+  deferred.push(deferred);
+  clearTimeout(timeoutId);
+  const done = er =>
+    _.each(deferreds, ({resolve, reject}) => er ? reject(er) : resolve());
+  body = _.extend(_body, body);
+  if (_.isEqual(_.pick(device, _.keys(body)), body)) {
     done();
   } else {
-    pending.timeoutId = setTimeout(async () => {
+    waiting.timeoutId = setTimeout(async () => {
       try {
         delete queue[key];
         await put({body, path: `/devices/${device_group}/${device_id}`, token});
