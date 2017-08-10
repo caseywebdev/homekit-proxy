@@ -1,8 +1,13 @@
+const pad = n => (n < 10 ? '0' : '') + n;
+
 const getTimestamp = () => {
   const date = new Date();
-  let time = date.toLocaleTimeString();
-  if (time.length < 11) time = `0${time}`;
-  return `${date.toDateString()} ${time}`;
+  const d = date.toDateString();
+  const h = date.getHours();
+  const m = date.getMinutes();
+  const s = date.getSeconds();
+  const amPm = h < 12 ? 'AM' : 'PM';
+  return `${d} ${pad(h % 12 || 12)}:${pad(m)}:${pad(s)} ${amPm}`;
 };
 
 module.exports = {

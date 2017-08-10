@@ -150,7 +150,19 @@ module.exports = {
         cid: TargetTemperature,
         cname: 'target temperature',
         toHap: ({device: {target_temperature_c}}) => target_temperature_c,
-        toNest: n => ({target_temperature_c: n})
+        toNest: ({
+          device: {
+            hvac_mode,
+            target_temperature_high_c: high,
+            target_temperature_low_c: low
+          },
+          value
+        }) =>
+          hvac_mode === 'heat-cool' ?
+          Math.abs(low - value) < Math.abs(high - value) ?
+          ({target_temperature_low_c: value}) :
+          ({target_temperature_high_c: value}) :
+          ({target_temperature_c: value})
       },
       {
         cid: CurrentRelativeHumidity,
@@ -162,14 +174,14 @@ module.exports = {
         cname: 'cooling threshold',
         toHap: ({device: {target_temperature_high_c}}) =>
           target_temperature_high_c,
-        toNest: n => ({target_temperature_high_c: n})
+        toNest: ({value}) => ({target_temperature_high_c: value})
       },
       {
         cid: HeatingThresholdTemperature,
         cname: 'heating threshold',
         toHap: ({device: {target_temperature_low_c}}) =>
           target_temperature_low_c,
-        toNest: n => ({target_temperature_low_c: n})
+        toNest: ({value}) => ({target_temperature_low_c: value})
       },
       {
         cid: TemperatureDisplayUnits,
@@ -178,11 +190,11 @@ module.exports = {
           C: TemperatureDisplayUnits.CELCIUS,
           F: TemperatureDisplayUnits.FAHRENHEIT
         })[temperature_scale],
-        toNest: unit => ({
+        toNest: ({value}) => ({
           temperature_scale: {
             [TemperatureDisplayUnits.CELCIUS]: 'C',
             [TemperatureDisplayUnits.FAHRENHEIT]: 'F'
-          }[unit]
+          }[value]
         })
       }
     ]
