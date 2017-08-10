@@ -31,6 +31,4 @@ RUN npm install --no-save
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
-ENTRYPOINT ''
-
 CMD ["bin/run"]
