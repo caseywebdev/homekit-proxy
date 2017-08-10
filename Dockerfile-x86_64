@@ -25,9 +25,6 @@ WORKDIR /code
 COPY package.json /code/package.json
 RUN npm install --no-save
 
-COPY bin /code/bin
-COPY src /code/src
-
 ENV LD_LIBRARY_PATH /usr/local/lib64
 
 ENTRYPOINT

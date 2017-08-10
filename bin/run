@@ -20,8 +20,10 @@ if [ `which docker` ]; then
     --network host \
     --restart always \
     --volume /etc/localtime:/etc/localtime \
+    --volume `pwd`/bin:/code/bin \
     --volume `pwd`/config.json:/code/config.json \
     --volume `pwd`/persist:/code/persist \
+    --volume `pwd`/src:/code/src \
     $NAME
 else
   rm -fr /var/run/dbus/pid /var/run/avahi-daemon/pid
