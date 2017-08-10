@@ -2,12 +2,12 @@ const _ = require('underscore');
 const EventSource = require('eventsource');
 const log = require('../../utils/log');
 
-const DEVICES_URL = 'https://developer-api.nest.com';
+const URL = 'https://developer-api.nest.com';
 
 const createSource = token => {
   const cbs = {};
   const devices = {};
-  const source = new EventSource(`${DEVICES_URL}?auth=${token}`);
+  const source = new EventSource(`${URL}?auth=${token}`);
   source.on('put', ({data}) => {
     try {
       const {devices: _devices, structures} = JSON.parse(data).data;

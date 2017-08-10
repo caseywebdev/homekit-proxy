@@ -38,8 +38,8 @@ const isDetected = ({
     last_event,
     last_event: {activity_zone_ids, end_time} = {}
   },
-  type,
-  options: {activityZones}
+  options: {activityZones},
+  type
 }) =>
   device_group === 'structures' ?
   away === 'home' :
@@ -53,6 +53,16 @@ const isDetected = ({
       ))
     ))
   );
+
+const toStep = (n, s) => Math.round(n / s) * s;
+
+const toC = n => (n - 32) / 1.8;
+
+const toF = n => (n * 1.8) + 32;
+
+const toHapC = n => toStep(toC(Math.ceil(toF(n))), 0.1);
+
+const toNestC = n => toStep(toC(Math.floor(toF(n))), 0.5);
 
 module.exports = {
   'carbon-monoxide-sensor': {
@@ -76,8 +86,8 @@ module.exports = {
       {
         cid: SmokeDetected,
         cname: 'smoke detected',
-        toHap: ({device: {co_alarm_state}}) =>
-          co_alarm_state === 'ok' ?
+        toHap: ({device: {smoke_alarm_state}}) =>
+          smoke_alarm_state === 'ok' ?
           SmokeDetected.SMOKE_NOT_DETECTED :
           SmokeDetected.SMOKE_DETECTED
       }
@@ -91,7 +101,7 @@ module.exports = {
         cid: MotionDetected,
         cname: 'motion detected',
         toHap: ({device, options}) =>
-          isDetected({device, type: 'motion', options})
+          isDetected({device, options, type: 'motion'})
       }
     ]
   },
@@ -103,7 +113,7 @@ module.exports = {
         cid: OccupancyDetected,
         cname: 'occupancy detected',
         toHap: ({device, options}) =>
-          isDetected({device, key: 'person', options}) ?
+          isDetected({device, options, type: 'person'}) ?
           OccupancyDetected.OCCUPANCY_DETECTED :
           OccupancyDetected.OCCUPANCY_NOT_DETECTED
       }
@@ -144,12 +154,14 @@ module.exports = {
       {
         cid: CurrentTemperature,
         cname: 'temperature',
-        toHap: ({device: {ambient_temperature_c}}) => ambient_temperature_c
+        toHap: ({device: {ambient_temperature_c}}) =>
+          toHapC(ambient_temperature_c)
       },
       {
         cid: TargetTemperature,
         cname: 'target temperature',
-        toHap: ({device: {target_temperature_c}}) => target_temperature_c,
+        toHap: ({device: {target_temperature_c}}) =>
+          toHapC(target_temperature_c),
         toNest: ({
           device: {
             hvac_mode,
@@ -157,12 +169,16 @@ module.exports = {
             target_temperature_low_c: low
           },
           value
-        }) =>
-          hvac_mode === 'heat-cool' ?
-          Math.abs(low - value) < Math.abs(high - value) ?
-          ({target_temperature_low_c: value}) :
-          ({target_temperature_high_c: value}) :
-          ({target_temperature_c: value})
+        }) => {
+          value = toNestC(value);
+          if (hvac_mode !== 'heat-cool') return ({target_temperature_c: value});
+
+          return (
+            Math.abs(low - value) < Math.abs(high - value) ?
+            ({target_temperature_low_c: value}) :
+            ({target_temperature_high_c: value})
+          );
+        }
       },
       {
         cid: CurrentRelativeHumidity,
@@ -173,15 +189,15 @@ module.exports = {
         cid: CoolingThresholdTemperature,
         cname: 'cooling threshold',
         toHap: ({device: {target_temperature_high_c}}) =>
-          target_temperature_high_c,
-        toNest: ({value}) => ({target_temperature_high_c: value})
+          toHapC(target_temperature_high_c),
+        toNest: ({value}) => ({target_temperature_high_c: toNestC(value)})
       },
       {
         cid: HeatingThresholdTemperature,
         cname: 'heating threshold',
         toHap: ({device: {target_temperature_low_c}}) =>
-          target_temperature_low_c,
-        toNest: ({value}) => ({target_temperature_low_c: value})
+          toHapC(target_temperature_low_c),
+        toNest: ({value}) => ({target_temperature_low_c: toNestC(value)})
       },
       {
         cid: TemperatureDisplayUnits,
