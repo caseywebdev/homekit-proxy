@@ -35,25 +35,28 @@ module.exports = class extends Base {
       }
 
       if (toNest) {
+        let cbs = [];
         const update = _.debounce(async value => {
+          const done = er => {
+            const _cbs = cbs;
+            cbs = [];
+            _.each(_cbs, cb => cb(er));
+          };
           try {
             if (!device) throw new Error(`Nest Device ${deviceName} not found`);
 
             const body = toNest({device, options, value});
             await updateDevice({body, device, token});
+            done();
           } catch (er) {
             log.error(er);
+            done(er);
           }
         }, DEBOUNCE_WAIT);
 
         char.on('set', async (value, cb) => {
-          try {
-            update(value);
-            cb();
-          } catch (er) {
-            log.error(er);
-            cb(er);
-          }
+          cbs.push(cb);
+          update(value);
         });
       }
     });

@@ -6,9 +6,8 @@ const URL = 'https://developer-api.nest.com';
 
 const urls = {};
 
-const put = async ({body, token, url}) => {
-  console.log(`PUT ${url} ${JSON.stringify(body)}`);
-  const res = await fetch(url, {
+const put = async ({body, path, token}) => {
+  const res = await fetch((urls[token] || URL) + path, {
     body: JSON.stringify(body),
     follow: 0,
     headers: {
@@ -19,16 +18,15 @@ const put = async ({body, token, url}) => {
     redirect: 'manual'
   });
 
-  const location = res.headers.get('location');
+  const {headers, ok, status, statusText} = res;
+  const location = headers.get('location');
   if (location) {
     const {host, protocol} = parse(location);
     urls[token] = `${protocol}//${host}`;
-    return put({body, token, url: location});
+    return put({body, path, token});
   }
 
-  if (!res.ok) {
-    throw new Error(`${res.status} ${res.statusText}: ${await res.text()}`);
-  }
+  if (!ok) throw new Error(`${status} ${statusText}: ${await res.text()}`);
 };
 
 module.exports = async ({body, device, token}) => {
@@ -36,6 +34,5 @@ module.exports = async ({body, device, token}) => {
   if (_.isEqual(current, body)) return;
 
   const {device_group, device_id} = device;
-  const url = `${urls[token] || URL}/devices/${device_group}/${device_id}`;
-  return put({body, token, url});
+  return put({body, path: `/devices/${device_group}/${device_id}`, token});
 };
