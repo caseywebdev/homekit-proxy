@@ -203,12 +203,12 @@ module.exports = {
         cid: TemperatureDisplayUnits,
         cname: 'display unit',
         toHap: ({device: {temperature_scale}}) => ({
-          C: TemperatureDisplayUnits.CELCIUS,
+          C: TemperatureDisplayUnits.CELSIUS,
           F: TemperatureDisplayUnits.FAHRENHEIT
         })[temperature_scale],
-        toNest: ({value}) => console.log('setting display units', 'given', value, 'celcius is', TemperatureDisplayUnits.CELCIUS, 'fah is', TemperatureDisplayUnits.FAHRENHEIT) || ({
+        toNest: ({value}) => ({
           temperature_scale: {
-            [TemperatureDisplayUnits.CELCIUS]: 'C',
+            [TemperatureDisplayUnits.CELSIUS]: 'C',
             [TemperatureDisplayUnits.FAHRENHEIT]: 'F'
           }[value]
         })
