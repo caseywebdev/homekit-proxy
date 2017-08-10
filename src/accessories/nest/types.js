@@ -142,13 +142,13 @@ module.exports = {
           heat: TargetHeatingCoolingState.HEAT,
           off: TargetHeatingCoolingState.OFF
         })[hvac_mode],
-        toNest: state => ({
+        toNest: ({value}) => ({
           hvac_mode: {
             [TargetHeatingCoolingState.AUTO]: 'heat-cool',
             [TargetHeatingCoolingState.COOL]: 'cool',
             [TargetHeatingCoolingState.HEAT]: 'heat',
             [TargetHeatingCoolingState.OFF]: 'off'
-          }[state]
+          }[value]
         })
       },
       {

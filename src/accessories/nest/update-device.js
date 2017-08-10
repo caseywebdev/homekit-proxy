@@ -11,12 +11,13 @@ const put = async ({body, path, token}) => {
   );
   const res = await fetch((urls[token] || URL) + path, {
     body: JSON.stringify(body),
-    follow: false,
+    follow: 0,
     headers: {
       Authorization: `Bearer ${token}`,
       'Content-Type': 'application/json'
     },
-    method: 'PUT'
+    method: 'PUT',
+    redirect: 'manual'
   });
 
   const location = res.headers.get('location');
