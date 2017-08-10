@@ -19,6 +19,7 @@ const createDeferred = () => {
 };
 
 const put = async ({body, path, token}) => {
+  return;
   const res = await fetch((urls[token] || URL) + path, {
     body: JSON.stringify(body),
     follow: 0,

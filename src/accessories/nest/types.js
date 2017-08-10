@@ -206,7 +206,7 @@ module.exports = {
           C: TemperatureDisplayUnits.CELCIUS,
           F: TemperatureDisplayUnits.FAHRENHEIT
         })[temperature_scale],
-        toNest: ({value}) => ({
+        toNest: ({value}) => console.log('setting display units', 'given', value, 'celcius is', TemperatureDisplayUnits.CELCIUS, 'fah is', TemperatureDisplayUnits.FAHRENHEIT) || ({
           temperature_scale: {
             [TemperatureDisplayUnits.CELCIUS]: 'C',
             [TemperatureDisplayUnits.FAHRENHEIT]: 'F'
