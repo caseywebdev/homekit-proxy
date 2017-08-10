@@ -60,9 +60,9 @@ const toC = n => (n - 32) / 1.8;
 
 const toF = n => (n * 1.8) + 32;
 
-const toHapC = n => toStep(toC(Math.ceil(toF(n))), 0.1);
+const toHapC = n => toStep(toC(n), 0.1);
 
-const toNestC = n => toStep(toC(Math.floor(toF(n))), 0.5);
+const toNestF = n => Math.round(toF(n));
 
 module.exports = {
   'carbon-monoxide-sensor': {
@@ -154,29 +154,29 @@ module.exports = {
       {
         cid: CurrentTemperature,
         cname: 'temperature',
-        toHap: ({device: {ambient_temperature_c}}) =>
-          toHapC(ambient_temperature_c)
+        toHap: ({device: {ambient_temperature_f}}) =>
+          toHapC(ambient_temperature_f)
       },
       {
         cid: TargetTemperature,
         cname: 'target temperature',
-        toHap: ({device: {target_temperature_c}}) =>
-          toHapC(target_temperature_c),
+        toHap: ({device: {target_temperature_f}}) =>
+          toHapC(target_temperature_f),
         toNest: ({
           device: {
             hvac_mode,
-            target_temperature_high_c: high,
-            target_temperature_low_c: low
+            target_temperature_high_f: high,
+            target_temperature_low_f: low
           },
           value
         }) => {
-          value = toNestC(value);
-          if (hvac_mode !== 'heat-cool') return ({target_temperature_c: value});
+          value = toNestF(value);
+          if (hvac_mode !== 'heat-cool') return {target_temperature_f: value};
 
           return (
             Math.abs(low - value) < Math.abs(high - value) ?
-            ({target_temperature_low_c: value}) :
-            ({target_temperature_high_c: value})
+            {target_temperature_low_f: value} :
+            {target_temperature_high_f: value}
           );
         }
       },
@@ -188,16 +188,16 @@ module.exports = {
       {
         cid: CoolingThresholdTemperature,
         cname: 'cooling threshold',
-        toHap: ({device: {target_temperature_high_c}}) =>
-          toHapC(target_temperature_high_c),
-        toNest: ({value}) => ({target_temperature_high_c: toNestC(value)})
+        toHap: ({device: {target_temperature_high_f}}) =>
+          toHapC(target_temperature_high_f),
+        toNest: ({value}) => ({target_temperature_high_f: toNestF(value)})
       },
       {
         cid: HeatingThresholdTemperature,
         cname: 'heating threshold',
-        toHap: ({device: {target_temperature_low_c}}) =>
-          toHapC(target_temperature_low_c),
-        toNest: ({value}) => ({target_temperature_low_c: toNestC(value)})
+        toHap: ({device: {target_temperature_low_f}}) =>
+          toHapC(target_temperature_low_f),
+        toNest: ({value}) => ({target_temperature_low_f: toNestF(value)})
       },
       {
         cid: TemperatureDisplayUnits,
