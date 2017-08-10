@@ -1,15 +1,14 @@
+const _ = require('underscore');
+const {parse} = require('url');
 const fetch = require('node-fetch');
-const url = require('url');
 
 const URL = 'https://developer-api.nest.com';
 
 const urls = {};
 
-const put = async ({body, path, token}) => {
-  console.log(
-    `PUT ${(urls[token] || URL) + path} ${JSON.stringify(body)}`
-  );
-  const res = await fetch((urls[token] || URL) + path, {
+const put = async ({body, token, url}) => {
+  console.log(`PUT ${url} ${JSON.stringify(body)}`);
+  const res = await fetch(url, {
     body: JSON.stringify(body),
     follow: 0,
     headers: {
@@ -22,9 +21,9 @@ const put = async ({body, path, token}) => {
 
   const location = res.headers.get('location');
   if (location) {
-    const {host, protocol} = url.parse(location);
+    const {host, protocol} = parse(location);
     urls[token] = `${protocol}//${host}`;
-    return put({body, path, token});
+    return put({body, token, url: location});
   }
 
   if (!res.ok) {
@@ -32,5 +31,11 @@ const put = async ({body, path, token}) => {
   }
 };
 
-module.exports = async ({body, device: {device_group, device_id}, token}) =>
-  put({body, path: `/devices/${device_group}/${device_id}`, token});
+module.exports = async ({body, device, token}) => {
+  const current = _.pick(device, _.keys(body));
+  if (_.isEqual(current, body)) return;
+
+  const {device_group, device_id} = device;
+  const url = `${urls[token] || URL}/devices/${device_group}/${device_id}`;
+  return put({body, token, url});
+};
