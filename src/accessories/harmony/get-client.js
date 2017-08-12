@@ -2,6 +2,7 @@ const _ = require('underscore');
 const {accessories, port = 10000} = require('../../../config');
 const Discover = require('harmonyhubjs-discover');
 const getClient = require('harmonyhubjs-client');
+const log = require('../../utils/log');
 
 let hubs = [];
 const discover = new Discover(port + _.size(accessories));
@@ -22,8 +23,25 @@ module.exports = async friendlyName => {
   let client = clients[ip];
   if (client) return client;
 
-  client = await (clients[ip] = getClient(ip));
-  client._xmppClient.on('error', () => client.end());
-  client._xmppClient.on('offline', () => delete clients[ip]);
-  return client;
+  const reset = _.once(() => delete clients[ip]);
+
+  try {
+    let online = false;
+    client = await (clients[ip] = getClient(ip));
+    client._xmppClient
+      .on('online', () => online = true)
+      .on('offline', () => {
+        online = false;
+        reset();
+      })
+      .on('error', er => {
+        log.error(er);
+        reset();
+        if (online) client.end();
+      });
+    return client;
+  } catch (er) {
+    reset();
+    throw er;
+  }
 };
