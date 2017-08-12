@@ -160,8 +160,18 @@ module.exports = {
       {
         cid: TargetTemperature,
         cname: 'target temperature',
-        toHap: ({device: {target_temperature_f}}) =>
-          toHapC(target_temperature_f),
+        toHap: ({device: {
+          ambient_temperature_f: current,
+          hvac_mode,
+          target_temperature_f,
+          target_temperature_high_f: high,
+          target_temperature_low_f: low
+        }}) =>
+          toHapC(
+            hvac_mode !== 'heat-cool' ? target_temperature_f :
+            Math.abs(low - current) < Math.abs(high - current) ? low :
+            high
+          ),
         toNest: ({
           device: {
             hvac_mode,
