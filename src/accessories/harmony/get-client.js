@@ -23,6 +23,7 @@ module.exports = async friendlyName => {
   if (client) return client;
 
   client = await (clients[ip] = getClient(ip));
+  client._xmppClient.on('error', () => client.end());
   client._xmppClient.on('offline', () => delete clients[ip]);
   return client;
 };
