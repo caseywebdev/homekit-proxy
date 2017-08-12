@@ -47,10 +47,10 @@ const isDetected = ({
   !end_time && (
     !activityZones ||
     !_.isEmpty(_.intersection(
-      activity_zone_ids,
-      _.compact(_.map(activityZones, name =>
-        (_.find(activity_zones, {name}) || {}) .id
-      ))
+      activityZones,
+      _.map(activity_zone_ids, _id =>
+        _.find(activity_zones, ({id}) => _id == id).name
+      )
     ))
   );
 
