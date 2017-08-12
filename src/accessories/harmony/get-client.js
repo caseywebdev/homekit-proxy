@@ -4,9 +4,7 @@ const Discover = require('harmonyhubjs-discover');
 const getClient = require('harmonyhubjs-client');
 const log = require('../../utils/log');
 
-let hubs = [];
 const discover = new Discover(port + _.size(accessories));
-discover.on('update', _hubs => hubs = _hubs);
 discover.start();
 
 process.on('SIGTERM', () => discover.stop());
@@ -14,6 +12,7 @@ process.on('SIGTERM', () => discover.stop());
 const clients = {};
 
 module.exports = async friendlyName => {
+  const hubs = _.values(discover.knownHubs);
   if (!hubs.length) throw new Error('No Harmony Hubs found');
 
   const hub = friendlyName ? _.find(hubs, {friendlyName}) : hubs[0];
