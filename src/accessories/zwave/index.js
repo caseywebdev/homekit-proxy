@@ -12,6 +12,7 @@ module.exports = class extends Base {
     const {name, nodeId, type} = options;
     const {category, characteristics, Service} = types[type];
     this.category = category;
+    this.level = 99;
     const service = new Service(name);
     _.each(characteristics, ({
       cid,
@@ -20,6 +21,7 @@ module.exports = class extends Base {
       hasTarget = false,
       index = 0,
       instance = 1,
+      isLevel,
       isTarget = false,
       toHap = _.identity,
       toZwave = _.identity
@@ -46,7 +48,10 @@ module.exports = class extends Base {
 
       if (!hasTarget) {
         char.on('set', (value, cb) => {
-          setValue(key, toZwave(value));
+          value = toZwave(value);
+          if (isLevel && value) this.level = value;
+          if (value === 'use level') value = this.level;
+          setValue(key, value);
           cb();
         });
       }

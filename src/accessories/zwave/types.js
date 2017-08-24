@@ -33,12 +33,13 @@ module.exports = {
         cname: 'power',
         classId: 0x26,
         toHap: n => n ? 1 : 0,
-        toZwave: n => n ? 99 : 0
+        toZwave: n => n ? 'use level' : 0
       },
       {
         cid: RotationSpeed,
         cname: 'speed',
         classId: 0x26,
+        isLevel: true,
         toHap: n => Math.floor(n / 99 * 100),
         toZwave: n => Math.ceil(n / 100 * 99)
       }
@@ -66,12 +67,13 @@ module.exports = {
         cname: 'power',
         classId: 0x26,
         toHap: n => n ? 1 : 0,
-        toZwave: n => n ? 99 : 0
+        toZwave: n => n ? 'use level' : 0
       },
       {
         cid: Brightness,
         cname: 'brightness',
         classId: 0x26,
+        isLevel: true,
         toHap: n => Math.floor(n / 99 * 100),
         toZwave: n => Math.ceil(n / 100 * 99)
       }
