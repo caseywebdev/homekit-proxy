@@ -4,19 +4,37 @@ const Discover = require('harmonyhubjs-discover');
 const getClient = require('harmonyhubjs-client');
 const log = require('../../utils/log');
 
-const discover = new Discover(port + _.size(accessories));
-discover.start();
+let discover;
 
-process.on('SIGTERM', () => discover.stop());
+const startDiscover = () => {
+  discover = new Discover(port + _.size(accessories));
+  discover.start();
+};
+
+const stopDiscover = () => discover.stop();
+process.on('SIGTERM', stopDiscover);
+
+const restartDiscover = () => {
+  stopDiscover();
+  startDiscover();
+};
+
+startDiscover();
 
 const clients = {};
 
 module.exports = async friendlyName => {
   const hubs = _.values(discover.knownHubs);
-  if (!hubs.length) throw new Error('No Harmony Hubs found');
+  if (!hubs.length) {
+    restartDiscover();
+    throw new Error('No Harmony Hubs found');
+  }
 
   const hub = friendlyName ? _.find(hubs, {friendlyName}) : hubs[0];
-  if (!hub) throw new Error(`Harmony Hub ${friendlyName} not found`);
+  if (!hub) {
+    restartDiscover();
+    throw new Error(`Harmony Hub ${friendlyName} not found`);
+  }
 
   const {ip} = hub;
   let client = clients[ip];
