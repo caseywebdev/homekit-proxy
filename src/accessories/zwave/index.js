@@ -38,21 +38,20 @@ module.exports = class extends Base {
 
       if (!isTarget) {
         char.on('get', cb => {
-          refreshValue(key);
-          const value = values[key];
-          if (value == null) return cb(new Error('Unknown value!'));
+          cb(null, char.value);
 
-          cb(null, toHap(value));
+          refreshValue(key);
         });
       }
 
       if (!hasTarget) {
         char.on('set', (value, cb) => {
+          cb();
+
           value = toZwave(value);
           if (isLevel && value) this.level = value;
           if (value === 'use level') value = this.level;
           setValue(key, value);
-          cb();
         });
       }
     });

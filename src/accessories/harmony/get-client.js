@@ -3,6 +3,9 @@ const {accessories, port = 10000} = require('../../../config');
 const Discover = require('harmonyhubjs-discover');
 const getClient = require('harmonyhubjs-client');
 
+// Long-running clients have connection issues...
+const MAX_CLIENT_DURATION = 1000 * 60 * 10;
+
 let discover;
 
 const startDiscover = () => {
@@ -11,7 +14,10 @@ const startDiscover = () => {
 };
 
 const stopDiscover = () => discover.stop();
-process.on('SIGTERM', stopDiscover);
+process.on('SIGTERM', () => {
+  stopDiscover();
+  _.invoke(clients, 'end');
+});
 
 const restartDiscover = () => {
   stopDiscover();
@@ -41,7 +47,13 @@ module.exports = async friendlyName => {
 
   try {
     client = await (clients[ip] = getClient(ip));
-    client._xmppClient.on('offline', () => delete clients[ip]);
+    const destroy = _.once(() => {
+      clearTimeout(destroyTimeoutId);
+      delete clients[ip];
+      client.end();
+    });
+    const destroyTimeoutId = setTimeout(destroy, MAX_CLIENT_DURATION);
+    client._xmppClient.on('offline', destroy);
     return client;
   } catch (er) {
     delete clients[ip];

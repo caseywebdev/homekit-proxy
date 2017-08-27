@@ -101,20 +101,21 @@ module.exports = class extends BaseAccessory {
   }
 
   getCurrentDoorState(cb) {
-    return this.api.getDeviceAttribute({name: 'doorstate'})
-      .then(value => cb(null, this.apiToHap[value]))
+    cb(null, this.states.doorstate.value);
+
+    this.api.getDeviceAttribute({name: 'doorstate'})
+      .then(value => this.states.doorstate.updateValue(this.apiToHap[value]))
       .catch(this.getErrorHandler(cb));
   }
 
   setTargetDoorState(value, cb) {
-    if (this.reactiveSetTargetDoorState) return cb();
+    cb();
+
+    if (this.reactiveSetTargetDoorState) return;
 
     value = this.hapToApi[value];
-    return this.api.setDeviceAttribute({name: 'desireddoorstate', value})
-      .then(() => {
-        this.poll();
-        cb();
-      })
+    this.api.setDeviceAttribute({name: 'desireddoorstate', value})
+      .then(() => this.poll())
       .catch(this.getErrorHandler(cb));
   }
 };

@@ -34,15 +34,15 @@ module.exports = class extends Base {
 
       if (toNest) {
         char.on('set', async (value, cb) => {
+          cb();
+
           try {
             if (!device) throw new Error(`Nest Device ${deviceName} not found`);
 
             const body = toNest({device, options, value});
-            updateDevice({body, device, token}).catch(log.error);
-            cb();
+            await updateDevice({body, device, token});
           } catch (er) {
             log.error(er);
-            cb(er);
           }
         });
       }
