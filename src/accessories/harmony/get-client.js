@@ -13,7 +13,8 @@ const startDiscover = () => {
   discover.start();
 };
 
-const stopDiscover = () => discover.stop();
+const stopDiscover = () => { try { discover.stop(); } catch (er) {} };
+
 process.on('SIGTERM', () => {
   stopDiscover();
   _.invoke(clients, 'end');

@@ -71,7 +71,7 @@ module.exports = class extends BaseAccessory {
   poll() {
     clearTimeout(this.pollTimeoutId);
     const {doorstate, desireddoorstate} = this.states;
-    return new Promise((resolve, reject) =>
+    new Promise((resolve, reject) =>
       doorstate.getValue(er => er ? reject(er) : resolve())
     ).then(() =>
       doorstate.value !== desireddoorstate.value ? ACTIVE_DELAY : IDLE_DELAY
