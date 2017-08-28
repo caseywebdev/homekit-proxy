@@ -41,7 +41,7 @@ module.exports = class extends Base {
 
         try {
           const {isOn} = await getState();
-          characteristic.updateValue(isOn);
+          characteristic.updateValue(isOn ? 1 : 0);
         } catch (er) {
           log.error(er);
         }
