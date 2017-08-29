@@ -2,6 +2,7 @@ const _ = require('underscore');
 const {accessories, port = 10000} = require('../../../config');
 const Discover = require('harmonyhubjs-discover');
 const getClient = require('harmonyhubjs-client');
+const log = require('../../utils/log');
 
 // Long-running clients have connection issues...
 const MAX_CLIENT_DURATION = 1000 * 60 * 10;
@@ -46,15 +47,18 @@ module.exports = async friendlyName => {
   let client = clients[ip];
   if (client) return client;
 
+  log.info(`Creating Harmony Hub Client for ${ip}`);
   try {
     client = await (clients[ip] = getClient(ip));
-    const destroy = _.once(() => {
+    const destroy = _.once(er => {
+      if (er) log.error(er);
+      log.info(`Destroying Harmony Hub Client for ${ip}`);
       clearTimeout(destroyTimeoutId);
       delete clients[ip];
-      client.end();
+      try { client.end(); } catch (er) { log.error(er); }
     });
     const destroyTimeoutId = setTimeout(destroy, MAX_CLIENT_DURATION);
-    client._xmppClient.on('offline', destroy);
+    client._xmppClient.on('offline', destroy).on('error', destroy);
     return client;
   } catch (er) {
     delete clients[ip];
