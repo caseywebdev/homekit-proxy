@@ -93,19 +93,12 @@ module.exports = class extends BaseAccessory {
     }
   }
 
-  getErrorHandler(cb) {
-    return er => {
-      log.error(er);
-      cb(er);
-    };
-  }
-
   getCurrentDoorState(cb) {
     cb(null, this.states.doorstate.value);
 
     this.api.getDeviceAttribute({name: 'doorstate'})
       .then(value => this.states.doorstate.updateValue(this.apiToHap[value]))
-      .catch(this.getErrorHandler(cb));
+      .catch(log.error);
   }
 
   setTargetDoorState(value, cb) {
@@ -116,6 +109,6 @@ module.exports = class extends BaseAccessory {
     value = this.hapToApi[value];
     this.api.setDeviceAttribute({name: 'desireddoorstate', value})
       .then(() => this.poll())
-      .catch(this.getErrorHandler(cb));
+      .catch(log.error);
   }
 };
