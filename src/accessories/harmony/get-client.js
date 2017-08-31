@@ -5,7 +5,7 @@ const getClient = require('harmonyhubjs-client');
 const log = require('../../utils/log');
 
 // Long-running clients have connection issues...
-const MAX_CLIENT_DURATION = 1000 * 60 * 10;
+const MAX_CLIENT_DURATION = 1000 * 60 * 5;
 
 let discover;
 
@@ -31,7 +31,7 @@ startDiscover();
 const clients = {};
 
 module.exports = async friendlyName => {
-  const hubs = _.values(discover.knownHubs);
+  const hubs = _.filter(_.values(discover.knownHubs), 'ip');
   if (!hubs.length) {
     restartDiscover();
     throw new Error('No Harmony Hubs found');
@@ -48,20 +48,24 @@ module.exports = async friendlyName => {
   if (client) return client;
 
   log.info(`Creating Harmony Hub Client for ${ip}`);
+
+  const destroy = _.once(er => {
+    if (er) log.error(er);
+    log.info(`Destroying Harmony Hub Client for ${ip}`);
+    clearTimeout(destroyTimeoutId);
+    delete clients[ip];
+    try { client.end(); } catch (er) {}
+  });
+
+  const destroyTimeoutId = setTimeout(destroy, MAX_CLIENT_DURATION);
+
   try {
     client = await (clients[ip] = getClient(ip));
-    const destroy = _.once(er => {
-      if (er) log.error(er);
-      log.info(`Destroying Harmony Hub Client for ${ip}`);
-      clearTimeout(destroyTimeoutId);
-      delete clients[ip];
-      try { client.end(); } catch (er) { log.error(er); }
-    });
-    const destroyTimeoutId = setTimeout(destroy, MAX_CLIENT_DURATION);
-    client._xmppClient.on('offline', destroy).on('error', destroy);
+    client._xmppClient.on('offline', destroy);
+    client._xmppClient.on('error', destroy);
     return client;
   } catch (er) {
-    delete clients[ip];
+    destroy();
     throw er;
   }
 };
