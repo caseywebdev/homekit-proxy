@@ -47,11 +47,8 @@ module.exports = async friendlyName => {
   let client = clients[ip];
   if (client) return client;
 
-  log.info(`Creating Harmony Hub Client for ${ip}`);
-
   const destroy = _.once(er => {
     if (er) log.error(er);
-    log.info(`Destroying Harmony Hub Client for ${ip}`);
     clearTimeout(destroyTimeoutId);
     delete clients[ip];
     try { client.end(); } catch (er) {}
