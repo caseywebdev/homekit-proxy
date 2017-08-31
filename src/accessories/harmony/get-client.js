@@ -31,7 +31,7 @@ startDiscover();
 const clients = {};
 
 module.exports = async friendlyName => {
-  const hubs = _.filter(_.values(discover.knownHubs), 'ip');
+  const hubs = _.filter(discover.knownHubs, 'ip');
   if (!hubs.length) {
     restartDiscover();
     throw new Error('No Harmony Hubs found');
