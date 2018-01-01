@@ -48,7 +48,7 @@ module.exports = {
     ]
   },
   'binary-switch': {
-    category: Switch,
+    category: SWITCH,
     Service: Switch,
     characteristics: [
       {
