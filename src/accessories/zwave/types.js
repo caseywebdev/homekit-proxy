@@ -4,7 +4,8 @@ const {
       FAN,
       LIGHTBULB,
       DOOR_LOCK,
-      SENSOR
+      SENSOR,
+      SWITCH
     }
   },
   Characteristic: {
@@ -19,7 +20,8 @@ const {
     BatteryService,
     Fan,
     Lightbulb,
-    LockMechanism
+    LockMechanism,
+    Switch
   }
 } = require('hap-nodejs');
 
@@ -42,6 +44,19 @@ module.exports = {
         isLevel: true,
         toHap: n => Math.floor(n / 99 * 100),
         toZwave: n => Math.ceil(n / 100 * 99)
+      }
+    ]
+  },
+  'binary-switch': {
+    category: Switch,
+    Service: Switch,
+    characteristics: [
+      {
+        cid: On,
+        cname: 'power',
+        classId: 0x25,
+        toHap: n => n ? 1 : 0,
+        toZwave: n => !!n
       }
     ]
   },
