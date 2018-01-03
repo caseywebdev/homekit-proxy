@@ -17,6 +17,7 @@ const toUsername = name =>
 
 _.each(_.pairs(accessories), ([name, typeOptions], i) => {
   const [type, options] = _.pairs(typeOptions)[0];
+  const {salt = ''} = options;
   const Accessory = require(`./accessories/${type}`);
   const accessory = new Accessory(_.extend(
     _.reduce(options.$include, (obj, key) => _.extend(obj, includes[key]), {}),
@@ -27,6 +28,6 @@ _.each(_.pairs(accessories), ([name, typeOptions], i) => {
     category: accessory.category,
     pincode,
     port: port + i,
-    username: toUsername(name)
+    username: toUsername(name + salt)
   });
 });
