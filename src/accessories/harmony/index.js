@@ -52,7 +52,7 @@ module.exports = class extends Base {
             if (turnOn && !isOn) await client.startActivity(activity.id);
             else if (!turnOn && isOn) await client.turnOff();
           } else {
-            if (turnOn) characteristic.updateValue(0);
+            setTimeout(() => characteristic.updateValue(0), 1000);
             sendCommand({client, command, deviceName});
           }
         } catch (er) {
