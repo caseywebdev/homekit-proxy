@@ -3,7 +3,7 @@ const _ = require('underscore');
 const getAction = ({command, device}) => {
   const lowerCmd = command.toLowerCase();
   for (let group of device.controlGroup) {
-    for (let cmd of group.functions) {
+    for (let cmd of group.function) {
       if (cmd.name.toLowerCase() === lowerCmd) return cmd.action;
     }
   }
