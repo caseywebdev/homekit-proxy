@@ -17,7 +17,7 @@ module.exports = class extends Base {
     this.category = SWITCH;
     const {activityName, command, deviceName, hubName, name} = options;
 
-    if (!activityName || !(deviceName && command)) {
+    if (!activityName && !(deviceName && command)) {
       throw new Error(
         'Either `activityName` or (`deviceName` and `command`) are required'
       );
