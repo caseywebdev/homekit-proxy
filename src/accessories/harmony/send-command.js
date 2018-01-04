@@ -15,7 +15,7 @@ const getAction = ({command, device}) => {
 
 module.exports = ({client, command, deviceName}) => {
   let {config: {device: devices}} = client;
-  const device = _.find(devices, {name: deviceName});
+  const device = _.find(devices, {label: deviceName});
   if (!device) throw new Error(`Harmony Device ${deviceName} not found`);
 
   const action = getAction({command, device}).replace(/:/g, '::');
