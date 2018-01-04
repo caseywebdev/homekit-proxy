@@ -63,11 +63,16 @@ module.exports = async friendlyName => {
 
   const destroyTimeoutId = setTimeout(destroy, MAX_CLIENT_DURATION);
 
-  try {
-    client = await (clients[ip] = getClient(ip));
+  const createClient = async () => {
+    const client = await getClient(ip);
     client._xmppClient.on('offline', destroy);
     client._xmppClient.on('error', destroy);
+    client.config = await client.getAvailableCommands();
     return client;
+  };
+
+  try {
+    return await (clients[ip] = createClient());
   } catch (er) {
     destroy();
     throw er;

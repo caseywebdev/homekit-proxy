@@ -1,7 +1,8 @@
-const _ = require('underscore');
 const Base = require('../base');
+const getActivity = require('./get-activity');
 const getClient = require('./get-client');
 const log = require('../../utils/log');
+const sendCommand = require('./send-command');
 
 const {
   Accessory: {Categories: {SWITCH}},
@@ -14,21 +15,13 @@ module.exports = class extends Base {
     super(options);
 
     this.category = SWITCH;
-    const {activityName: label, hubName, name} = options;
+    const {activityName, command, deviceName, hubName, name} = options;
 
-    const getState = async () => {
-      const client = await getClient(hubName);
-      let {activities} = client;
-      if (!activities) {
-        activities = client.activities = await client.getActivities();
-      }
-      const activity = _.find(activities, {label});
-      if (!activity) throw new Error(`Harmony Activity ${label} not found`);
-
-      const currentActivity = await client.getCurrentActivity();
-      const isOn = activity.id === currentActivity;
-      return {activity, client, isOn};
-    };
+    if (!activityName || !(deviceName && command)) {
+      throw new Error(
+        'Either `activityName` or (`deviceName` and `command`) are required'
+      );
+    }
 
     const service = new Switch(name);
     const characteristic = service.getCharacteristic(On);
@@ -37,11 +30,14 @@ module.exports = class extends Base {
         log.info(`[${name}] on: ${oldValue} -> ${newValue}`)
       )
       .on('get', async cb => {
-        cb(null, characteristic.value);
+        cb(null, activityName ? characteristic.value : 0);
 
         try {
-          const {isOn} = await getState();
-          characteristic.updateValue(isOn ? 1 : 0);
+          if (activityName) {
+            const client = await getClient(hubName);
+            const {isOn} = await getActivity({activityName, client});
+            characteristic.updateValue(isOn ? 1 : 0);
+          }
         } catch (er) {
           log.error(er);
         }
@@ -50,9 +46,15 @@ module.exports = class extends Base {
         cb();
 
         try {
-          const {activity, client, isOn} = await getState();
-          if (turnOn && !isOn) await client.startActivity(activity.id);
-          else if (!turnOn && isOn) await client.turnOff();
+          const client = await getClient(hubName);
+          if (activityName) {
+            const {activity, isOn} = await getActivity({activityName, client});
+            if (turnOn && !isOn) await client.startActivity(activity.id);
+            else if (!turnOn && isOn) await client.turnOff();
+          } else {
+            if (turnOn) characteristic.updateValue(0);
+            sendCommand({client, command, deviceName});
+          }
         } catch (er) {
           log.error(er);
         }
