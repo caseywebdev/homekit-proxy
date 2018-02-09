@@ -2,9 +2,9 @@
   "private": true,
   "dependencies": {
     "eventsource": "1.0.5",
-    "hap-nodejs": "0.4.39",
+    "hap-nodejs": "0.4.41",
     "harmonyhubjs-client": "1.1.10",
-    "node-fetch": "1.7.3",
+    "node-fetch": "2.0.0",
     "openzwave-shared": "1.4.0",
     "underscore": "1.8.3"
   }
