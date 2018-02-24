@@ -1,8 +1,9 @@
 const chalk = require('chalk');
 
-chalk.enabled = true;
-
-const {blue, cyan, green, grey, magenta, red, yellow} = chalk;
+const {blue, cyan, green, grey, magenta, red, yellow} = new chalk.constructor({
+  enabled: true,
+  level: 1
+});
 
 const DELIMITER = yellow('-');
 
