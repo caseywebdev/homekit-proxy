@@ -12,7 +12,7 @@ const getClient = token => {
 
   const handleError = async er => {
     client.source.close();
-    log.error(er);
+    log.error(`Nest error (status code ${er.status || 'unknown'})`);
     log.error('Reconnecting to Nest in 10 seconds...');
     await sleep(10);
     client.source = createSource();

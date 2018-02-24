@@ -84,7 +84,7 @@ module.exports = class extends BaseAccessory {
   logChange(name, {oldValue, newValue}) {
     const from = this.hapToEnglish[oldValue];
     const to = this.hapToEnglish[newValue];
-    log.info(`[${this.name}] ${name}: ${from} -> ${to}`);
+    log.change(this.name, name, from, to);
 
     if (name === 'doorstate') {
       this.reactiveSetTargetDoorState = true;

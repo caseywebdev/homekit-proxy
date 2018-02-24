@@ -30,7 +30,7 @@ module.exports = class extends Base {
     if (activityName) {
       characteristic
         .on('change', ({oldValue, newValue}) =>
-          log.info(`[${name}] on: ${oldValue} -> ${newValue}`)
+          log.change(name, 'on', oldValue, newValue)
         )
         .on('get', async cb => {
           cb(null, characteristic.value);
@@ -64,7 +64,7 @@ module.exports = class extends Base {
           cb();
 
           try {
-            log.info(`[${name}] pressed`);
+            log.event(name, 'pressed');
             setTimeout(() => characteristic.updateValue(0), 100);
             const client = await getClient({hubIp});
             sendCommand({client, command, deviceName});

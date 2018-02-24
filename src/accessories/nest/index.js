@@ -18,7 +18,7 @@ module.exports = class extends Base {
       const char = service.getCharacteristic(cid);
 
       char.on('change', ({oldValue, newValue}) =>
-        log.info(`[${name}] ${cname}: ${oldValue} -> ${newValue}`)
+        log.change(name, cname, oldValue, newValue)
       );
 
       if (toHap) {

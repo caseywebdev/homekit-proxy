@@ -30,7 +30,7 @@ module.exports = class extends Base {
       const key = [nodeId, classId, instance, index].join('-');
       const value = values[key];
       char.on('change', ({oldValue, newValue}) =>
-        log.info(`[${name}] ${cname}: ${oldValue} -> ${newValue}`)
+        log.change(name, cname, oldValue, newValue)
       );
       if (value != null) char.updateValue(toHap(value));
 
