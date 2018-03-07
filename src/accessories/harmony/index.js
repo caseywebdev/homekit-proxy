@@ -15,11 +15,11 @@ module.exports = class extends Base {
     super(options);
 
     this.category = SWITCH;
-    const {activityName, command, deviceName, hubIp, name} = options;
+    const {activityName, commands, deviceName, hubIp, name} = options;
 
-    if (!activityName && !(deviceName && command)) {
+    if (!activityName && !(deviceName && commands)) {
       throw new Error(
-        'Either `activityName` or (`deviceName` and `command`) are required'
+        'Either `activityName` or (`deviceName` and `commands`) are required'
       );
     }
 
@@ -67,7 +67,9 @@ module.exports = class extends Base {
             log.event(name, 'pressed');
             setTimeout(() => characteristic.updateValue(0), 100);
             const client = await getClient({hubIp});
-            sendCommand({client, command, deviceName});
+            commands.forEach(command =>
+              sendCommand({client, command, deviceName})
+            );
           } catch (er) {
             log.error(er);
           }
