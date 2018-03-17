@@ -5,21 +5,47 @@ const sleep = require('../../utils/sleep');
 
 const URL = 'https://developer-api.nest.com';
 
+// Reset connections every hour. If these connections are open too long they
+// stop reporting changes!
+const RESET_INTERVAL = 1000 * 60 * 60;
+
 const clients = {};
 
 const getClient = token => {
   if (clients[token]) return clients[token];
 
+  const close = () => {
+    if (client.resetTimeoutId) {
+      clearTimeout(client.resetTimeoutId);
+      delete client.resetTimeoutId;
+    }
+
+    if (client.source) {
+      client.source.close();
+      delete client.source;
+    }
+  };
+
+  const reset = () => {
+    close();
+
+    client.resetTimeoutId = setTimeout(reset, RESET_INTERVAL);
+    client.source = createSource();
+  };
+
   const handleError = async er => {
-    client.source.close();
+    close();
+
     log.error(`Nest error (status code ${er.status || 'unknown'})`);
     log.error('Reconnecting to Nest in 10 seconds...');
     await sleep(10);
-    client.source = createSource();
+
+    reset();
   };
 
   const createSource = () => {
     const source = new EventSource(`${URL}?auth=${token}`);
+
     source.on('put', ({data}) => {
       try {
         const {devices: _devices, structures} = JSON.parse(data).data;
@@ -35,18 +61,22 @@ const getClient = token => {
         handleError(er);
       }
     });
+
     source.on('error', handleError);
+
     return source;
   };
 
   const cbs = {};
   const devices = {};
-  const client = clients[token] = {cbs, devices, source: createSource()};
+  const client = clients[token] = {cbs, close, devices};
+
+  reset();
 
   return client;
 };
 
-process.on('SIGTERM', () => _.invoke(_.map(clients, 'source'), 'close'));
+process.on('SIGTERM', () => _.invoke(clients, 'close'));
 
 module.exports = ({cb, deviceName, token}) => {
   const client = getClient(token);
