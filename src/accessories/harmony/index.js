@@ -1,8 +1,10 @@
+const _ = require('underscore');
 const Base = require('../base');
 const getActivity = require('./get-activity');
 const getClient = require('./get-client');
 const log = require('../../utils/log');
 const sendCommand = require('./send-command');
+const sleep = require('../../utils/sleep');
 
 const {
   Accessory: {Categories: {SWITCH}},
@@ -67,9 +69,10 @@ module.exports = class extends Base {
             log.event(name, 'pressed');
             setTimeout(() => characteristic.updateValue(0), 100);
             const client = await getClient({hubIp});
-            commands.forEach(command =>
-              sendCommand({client, command, deviceName})
-            );
+            for (const command of commands) {
+              if (_.isNumber(command)) await sleep(command);
+              else sendCommand({client, command, deviceName});
+            }
           } catch (er) {
             log.error(er);
           }
