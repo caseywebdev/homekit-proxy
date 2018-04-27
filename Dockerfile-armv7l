@@ -26,8 +26,8 @@ RUN apt-get update && \
 
 WORKDIR /code
 
-COPY package.json /code/package.json
-RUN npm install --no-save
+COPY package-lock.json package.json ./
+RUN npm install
 
 ENV LD_LIBRARY_PATH /usr/local/lib
 
