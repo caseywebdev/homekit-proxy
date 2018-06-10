@@ -14,7 +14,7 @@ module.exports = ({device, networkKey: NetworkKey}) => {
 
   const client = new OZW({
     Logging: false,
-    LogInitialization: false,
+    LogInitialisation: false,
     NetworkKey
   });
   const ready = {};
