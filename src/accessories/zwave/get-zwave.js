@@ -12,7 +12,11 @@ module.exports = ({device, networkKey: NetworkKey}) => {
   const zwave = byDevice[device];
   if (zwave) return zwave;
 
-  const client = new OZW({Logging: false, ConsoleOutput: true, NetworkKey});
+  const client = new OZW({
+    Logging: false,
+    LogInitialization: false,
+    NetworkKey
+  });
   const ready = {};
   const values = {};
   const pending = {};
