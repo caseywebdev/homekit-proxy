@@ -12,6 +12,35 @@ const {
 const ACTIVE_DELAY = 1000 * 2;
 const IDLE_DELAY = 1000 * 10;
 
+const API_TO_HAP = {
+  0: CurrentDoorState.OPEN,
+  1: CurrentDoorState.OPEN,
+  2: CurrentDoorState.CLOSED,
+  3: CurrentDoorState.OPEN,
+  4: CurrentDoorState.OPENING,
+  5: CurrentDoorState.CLOSING,
+  9: CurrentDoorState.OPEN
+};
+
+const HAP_TO_API = {
+  [TargetDoorState.OPEN]: 1,
+  [TargetDoorState.CLOSED]: 0
+};
+
+const HAP_TO_ENGLISH = {
+  [CurrentDoorState.OPEN]: 'open',
+  [CurrentDoorState.CLOSED]: 'closed',
+  [CurrentDoorState.OPENING]: 'opening',
+  [CurrentDoorState.CLOSING]: 'closing'
+};
+
+const CURRENT_TO_TARGET = {
+  [CurrentDoorState.OPEN]: TargetDoorState.OPEN,
+  [CurrentDoorState.CLOSED]: TargetDoorState.CLOSED,
+  [CurrentDoorState.OPENING]: TargetDoorState.OPEN,
+  [CurrentDoorState.CLOSING]: TargetDoorState.CLOSED
+};
+
 module.exports = class extends BaseAccessory {
   constructor(options) {
     super(options);
@@ -20,32 +49,6 @@ module.exports = class extends BaseAccessory {
 
     this.api = new Api(options);
     this.name = options.name;
-
-    this.apiToHap = {
-      1: CurrentDoorState.OPEN,
-      2: CurrentDoorState.CLOSED,
-      4: CurrentDoorState.OPENING,
-      5: CurrentDoorState.CLOSING
-    };
-
-    this.hapToApi = {
-      [TargetDoorState.OPEN]: 1,
-      [TargetDoorState.CLOSED]: 0
-    };
-
-    this.hapToEnglish = {
-      [CurrentDoorState.OPEN]: 'open',
-      [CurrentDoorState.CLOSED]: 'closed',
-      [CurrentDoorState.OPENING]: 'opening',
-      [CurrentDoorState.CLOSING]: 'closing'
-    };
-
-    this.currentToTarget = {
-      [CurrentDoorState.OPEN]: TargetDoorState.OPEN,
-      [CurrentDoorState.CLOSED]: TargetDoorState.CLOSED,
-      [CurrentDoorState.OPENING]: TargetDoorState.OPEN,
-      [CurrentDoorState.CLOSING]: TargetDoorState.CLOSED
-    };
 
     this.addService(this.service = new GarageDoorOpener(options.name));
 
@@ -82,13 +85,13 @@ module.exports = class extends BaseAccessory {
   }
 
   logChange(name, {oldValue, newValue}) {
-    const from = this.hapToEnglish[oldValue];
-    const to = this.hapToEnglish[newValue];
+    const from = HAP_TO_ENGLISH[oldValue];
+    const to = HAP_TO_ENGLISH[newValue];
     log.change(this.name, name, from, to);
 
     if (name === 'doorstate') {
       this.reactiveSetTargetDoorState = true;
-      this.states.desireddoorstate.setValue(this.currentToTarget[newValue]);
+      this.states.desireddoorstate.setValue(CURRENT_TO_TARGET[newValue]);
       delete this.reactiveSetTargetDoorState;
     }
   }
@@ -97,7 +100,7 @@ module.exports = class extends BaseAccessory {
     cb(null, this.states.doorstate.value);
 
     this.api.getDeviceAttribute({name: 'doorstate'})
-      .then(value => this.states.doorstate.updateValue(this.apiToHap[value]))
+      .then(value => this.states.doorstate.updateValue(API_TO_HAP[value]))
       .catch(log.error);
   }
 
@@ -106,7 +109,7 @@ module.exports = class extends BaseAccessory {
 
     if (this.reactiveSetTargetDoorState) return;
 
-    value = this.hapToApi[value];
+    value = HAP_TO_API[value];
     this.api.setDeviceAttribute({name: 'desireddoorstate', value})
       .then(() => this.poll())
       .catch(log.error);
