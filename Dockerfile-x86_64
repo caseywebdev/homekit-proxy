@@ -9,7 +9,7 @@ RUN apt-get update && \
       libavahi-compat-libdnssd-dev \
       libudev-dev \
       make && \
-    curl -fLsS https://deb.nodesource.com/setup_10.x | bash - && \
+    curl -fLsS https://deb.nodesource.com/setup_11.x | bash - && \
     apt-get install -y nodejs && \
     mkdir /usr/local/src/open-zwave && \
     curl -fLsS \
