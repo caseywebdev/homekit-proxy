@@ -2,7 +2,7 @@ FROM debian
 
 RUN apt-get update && \
     apt-get install -y curl g++ git gnupg libudev-dev make && \
-    curl -fLsS https://deb.nodesource.com/setup_11.x | bash - && \
+    curl -fLsS https://deb.nodesource.com/setup_8.x | bash - && \
     apt-get install -y nodejs && \
     mkdir /usr/local/src/open-zwave && \
     curl -fLsS \
