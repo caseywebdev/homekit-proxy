@@ -1,14 +1,7 @@
 FROM debian
 
 RUN apt-get update && \
-    apt-get install -y \
-      curl \
-      g++ \
-      git \
-      gnupg \
-      libavahi-compat-libdnssd-dev \
-      libudev-dev \
-      make && \
+    apt-get install -y curl g++ git gnupg libudev-dev make && \
     curl -fLsS https://deb.nodesource.com/setup_11.x | bash - && \
     apt-get install -y nodejs && \
     mkdir /usr/local/src/open-zwave && \
@@ -17,9 +10,7 @@ RUN apt-get update && \
       tar xz -C /usr/local/src/open-zwave --strip-components 1 && \
     cd /usr/local/src/open-zwave && \
     make && \
-    make install && \
-    mkdir -p /var/run/dbus && \
-    sed -i 's/#enable-dbus=yes/enable-dbus=yes/' /etc/avahi/avahi-daemon.conf
+    make install
 
 WORKDIR /code
 

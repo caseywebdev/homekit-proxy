@@ -26,11 +26,5 @@ if [ `which docker` ]; then
     --volume `pwd`/src:/code/src \
     $NAME
 else
-  rm -fr /var/run/dbus/pid /var/run/avahi-daemon/pid
-
-  dbus-daemon --system
-
-  avahi-daemon -D
-
   node src
 fi

@@ -1,14 +1,7 @@
 FROM resin/rpi-raspbian
 
 RUN apt-get update && \
-    apt-get install -y \
-      avahi-daemon \
-      curl \
-      g++ \
-      git \
-      libavahi-compat-libdnssd-dev \
-      libudev-dev \
-      make && \
+    apt-get install -y curl g++ git gnupg libudev-dev make && \
     curl -fLsS https://deb.nodesource.com/setup_11.x | bash - && \
     apt-get install -y nodejs && \
     mkdir /usr/local/src/open-zwave && \
@@ -17,12 +10,7 @@ RUN apt-get update && \
       tar xz -C /usr/local/src/open-zwave --strip-components 1 && \
     cd /usr/local/src/open-zwave && \
     make && \
-    make install && \
-    mkdir -p /var/run/dbus && \
-    sed -i \
-      -e 's/#enable-dbus=yes/enable-dbus=yes/' \
-      -e 's/rlimit-nproc=3/#rlimit-nproc=3/' \
-      /etc/avahi/avahi-daemon.conf
+    make install
 
 WORKDIR /code
 
