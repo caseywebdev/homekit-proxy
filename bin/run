@@ -6,14 +6,14 @@ if [ `which docker` ]; then
   NAME=`jq -r .name config.json`
   if [ $NAME == 'null' ]; then NAME='homekit-proxy'; fi
 
-  docker build --file Dockerfile-`uname -m` --tag $NAME .
+  docker build --tag $NAME .
 
   set +e
   docker stop $NAME 2>/dev/null
   docker rm -f $NAME 2>/dev/null
   set -e
 
-  docker run \
+  exec docker run \
     --detach \
     `jq -r '.devices[]? | "--device " + . + ":" + .' config.json` \
     --name $NAME \
@@ -26,5 +26,5 @@ if [ `which docker` ]; then
     --volume `pwd`/src:/code/src \
     $NAME
 else
-  node src
+  exec node src
 fi
