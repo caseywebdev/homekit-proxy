@@ -2,7 +2,7 @@ FROM node:11.1.0
 
 CMD ["bin/run"]
 
-ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64
+ENV LD_LIBRARY_PATH="/usr/local/lib:/usr/local/lib64"
 
 RUN apt-get update && \
     apt-get install -y libudev-dev && \
