@@ -2,8 +2,8 @@
 
 set -e
 
-if [ `which docker` ]; then
-  NAME=`jq -r .name config.json`
+if [ $(which docker) ]; then
+  NAME=$(jq -r .name config.json)
   if [ $NAME == 'null' ]; then NAME='homekit-proxy'; fi
 
   docker build --tag $NAME .
@@ -15,15 +15,15 @@ if [ `which docker` ]; then
 
   exec docker run \
     --detach \
-    `jq -r '.devices[]? | "--device " + . + ":" + .' config.json` \
+    $(jq -r '.devices[]? | "--device " + . + ":" + .' config.json) \
+    --env TZ=$(jq -r .timezone config.json) \
     --name $NAME \
     --network host \
     --restart always \
-    --volume /etc/localtime:/etc/localtime \
-    --volume `pwd`/bin:/code/bin \
-    --volume `pwd`/config.json:/code/config.json \
-    --volume `pwd`/persist:/code/persist \
-    --volume `pwd`/src:/code/src \
+    --volume $PWD/bin:/code/bin \
+    --volume $PWD/config.json:/code/config.json \
+    --volume $PWD/persist:/code/persist \
+    --volume $PWD/src:/code/src \
     $NAME
 else
   exec node src
