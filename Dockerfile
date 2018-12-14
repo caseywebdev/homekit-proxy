@@ -1,4 +1,4 @@
-FROM node:11.1.0
+FROM node:11.4.0
 
 CMD ["bin/run"]
 
