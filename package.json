@@ -7,6 +7,7 @@
     "harmonyhubjs-client": "1",
     "node-fetch": "2",
     "openzwave-shared": "1",
+    "rpio": "1",
     "underscore": "1"
   }
 }
