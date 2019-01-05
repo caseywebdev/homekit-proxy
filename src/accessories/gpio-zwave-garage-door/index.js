@@ -42,7 +42,7 @@ module.exports = class extends Base {
     const target = service.getCharacteristic(TargetDoorState);
     let transitionTimeoutId;
     const key = [zwaveNodeId, BINARY_SENSOR_CLASS_ID, 1, 0].join('-');
-    const currentValue = values[key];
+    const currentValue = values[key] || false;
     current.on('change', ({oldValue, newValue}) => {
       log.change(name,
         'Current Door State',
@@ -73,6 +73,8 @@ module.exports = class extends Base {
       )
     );
 
+    rpio.open(gpioPinId, rpio.OUTPUT, rpio.LOW);
+
     target.on('set', async (value, cb) => {
       cb();
 
@@ -86,10 +88,9 @@ module.exports = class extends Base {
       );
 
       try {
-        rpio.open(gpioPinId, rpio.OUTPUT, rpio.HIGH);
+        rpio.write(gpioPinId, rpio.HIGH);
         await sleep(0.5);
         rpio.write(gpioPinId, rpio.LOW);
-        rpio.close(gpioPinId);
       } catch (er) {
         log.error(er);
       }
