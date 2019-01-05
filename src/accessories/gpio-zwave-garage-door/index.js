@@ -6,19 +6,19 @@ const sleep = require('../../utils/sleep');
 
 const {
   Accessory: {Categories: {GARAGE_DOOR_OPENER}},
-  Characteristic: {CurrentDoorState},
+  Characteristic: {CurrentDoorState, TargetDoorState},
   Service: {GarageDoorOpener}
 } = require('hap-nodejs');
 
 // 0x00 is off (closed), 0xff is on (open).
-const CLASS_ID = 0x20;
+const BINARY_SENSOR_CLASS_ID = 0x30;
 
 // The longest amount of time it should take the door to open or close.
 const MAX_TRANSITION_TIME = 20;
 
 const TO_HAP = {
-  [0x00]: CurrentDoorState.CLOSED,
-  [0xff]: CurrentDoorState.OPEN
+  [false]: CurrentDoorState.CLOSED,
+  [true]: CurrentDoorState.OPEN
 };
 
 const TO_ENGLISH = {
@@ -39,9 +39,9 @@ module.exports = class extends Base {
 
     const {client, refreshValue, values} = getZwave(options);
     const current = service.getCharacteristic(CurrentDoorState);
-    const target = service.getCharacteristic(CurrentDoorState);
+    const target = service.getCharacteristic(TargetDoorState);
     let transitionTimeoutId;
-    const key = [zwaveNodeId, CLASS_ID, 1, 0].join('-');
+    const key = [zwaveNodeId, BINARY_SENSOR_CLASS_ID, 1, 0].join('-');
     const currentValue = values[key];
     current.on('change', ({oldValue, newValue}) => {
       log.change(name,
