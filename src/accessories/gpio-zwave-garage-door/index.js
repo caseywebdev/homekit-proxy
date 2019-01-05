@@ -73,7 +73,7 @@ module.exports = class extends Base {
       )
     );
 
-    rpio.open(gpioPinId, rpio.OUTPUT, rpio.LOW);
+    rpio.open(gpioPinId, rpio.OUTPUT, rpio.HIGH);
 
     target.on('set', async (value, cb) => {
       cb();
@@ -88,9 +88,9 @@ module.exports = class extends Base {
       );
 
       try {
-        rpio.write(gpioPinId, rpio.HIGH);
-        await sleep(0.5);
         rpio.write(gpioPinId, rpio.LOW);
+        await sleep(0.5);
+        rpio.write(gpioPinId, rpio.HIGH);
       } catch (er) {
         log.error(er);
       }
