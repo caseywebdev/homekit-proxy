@@ -34,14 +34,14 @@ module.exports = class extends Base {
 
     this.category = GARAGE_DOOR_OPENER;
 
-    const {name, nodeId, gpioId} = options;
+    const {gpioPinId, name, zwaveNodeId} = options;
     const service = new GarageDoorOpener(name);
 
     const {client, refreshValue, values} = getZwave(options);
     const current = service.getCharacteristic(CurrentDoorState);
     const target = service.getCharacteristic(CurrentDoorState);
     let transitionTimeoutId;
-    const key = [nodeId, BINARY_SENSOR_CLASS_ID, 1, 0].join('-');
+    const key = [zwaveNodeId, BINARY_SENSOR_CLASS_ID, 1, 0].join('-');
     const currentValue = values[key];
     current.on('change', ({oldValue, newValue}) => {
       log.change(name,
@@ -86,9 +86,9 @@ module.exports = class extends Base {
       );
 
       try {
-        rpio.open(gpioId, rpio.OUTPUT, rpio.HIGH);
+        rpio.open(gpioPinId, rpio.OUTPUT, rpio.HIGH);
         await sleep(0.5);
-        rpio.close(gpioId);
+        rpio.close(gpioPinId);
       } catch (er) {
         log.error(er);
       }
