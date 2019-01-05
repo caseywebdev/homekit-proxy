@@ -89,7 +89,7 @@ module.exports = class extends Base {
 
       try {
         rpio.write(gpioPinId, rpio.LOW);
-        await sleep(0.5);
+        await sleep(1);
         rpio.write(gpioPinId, rpio.HIGH);
       } catch (er) {
         log.error(er);
