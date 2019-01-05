@@ -11,7 +11,7 @@ const {
 } = require('hap-nodejs');
 
 // 0x00 is off (closed), 0xff is on (open).
-const BINARY_SENSOR_CLASS_ID = 0x30;
+const CLASS_ID = 0x20;
 
 // The longest amount of time it should take the door to open or close.
 const MAX_TRANSITION_TIME = 20;
@@ -41,7 +41,7 @@ module.exports = class extends Base {
     const current = service.getCharacteristic(CurrentDoorState);
     const target = service.getCharacteristic(CurrentDoorState);
     let transitionTimeoutId;
-    const key = [zwaveNodeId, BINARY_SENSOR_CLASS_ID, 1, 0].join('-');
+    const key = [zwaveNodeId, CLASS_ID, 1, 0].join('-');
     const currentValue = values[key];
     current.on('change', ({oldValue, newValue}) => {
       log.change(name,
@@ -88,6 +88,7 @@ module.exports = class extends Base {
       try {
         rpio.open(gpioPinId, rpio.OUTPUT, rpio.HIGH);
         await sleep(0.5);
+        rpio.write(gpioPinId, rpio.LOW);
         rpio.close(gpioPinId);
       } catch (er) {
         log.error(er);
