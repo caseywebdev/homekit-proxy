@@ -78,6 +78,8 @@ module.exports = class extends Base {
     target.on('set', async (value, cb) => {
       cb();
 
+      if (value === current.value) return;
+
       // After MAX_TRANSITION_TIME has passed, automatically set the target
       // state to whatever the current state is. This will ensure the door isn't
       // in a permanent "opening" or "closing" state.
