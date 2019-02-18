@@ -71,7 +71,7 @@ module.exports = class extends Base {
             const client = await getClient({hubIp});
             for (const command of commands) {
               if (_.isNumber(command)) await sleep(command);
-              else sendCommand({client, command, deviceName});
+              else await sendCommand({client, command, deviceName});
             }
           } catch (er) {
             log.error(er);

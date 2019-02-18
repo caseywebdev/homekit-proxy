@@ -13,12 +13,12 @@ const getAction = ({command, device}) => {
   );
 };
 
-module.exports = ({client, command, deviceName}) => {
+module.exports = async ({client, command, deviceName}) => {
   let {config: {device: devices}} = client;
   const device = _.find(devices, {label: deviceName});
   if (!device) throw new Error(`Harmony Device ${deviceName} not found`);
 
   const action = getAction({command, device}).replace(/:/g, '::');
-  client.send('holdAction', `action=${action}:status=press`);
-  client.send('holdAction', `action=${action}:status=release`);
+  await client.send('holdAction', `action=${action}:status=press`);
+  await client.send('holdAction', `action=${action}:status=release`);
 };
