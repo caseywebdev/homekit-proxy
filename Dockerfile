@@ -1,12 +1,18 @@
-FROM node:11.13.0
+FROM node:11.13.0-alpine
 
 CMD ["bin/run"]
 
-ENV LD_LIBRARY_PATH="/usr/local/lib:/usr/local/lib64"
-
-RUN apt-get update && \
-    apt-get install -y libudev-dev && \
-    mkdir /usr/local/src/open-zwave && \
+RUN apk add --no-cache \
+      coreutils \
+      curl \
+      eudev-dev \
+      g++ \
+      git \
+      linux-headers \
+      make \
+      python \
+      && \
+    mkdir -p /usr/local/src/open-zwave && \
     curl -fLsS \
       https://api.github.com/repos/OpenZWave/open-zwave/tarball/master | \
       tar xz -C /usr/local/src/open-zwave --strip-components 1 && \
