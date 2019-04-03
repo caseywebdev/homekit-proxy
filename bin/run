@@ -2,7 +2,7 @@
 
 if [ $(which docker) ]; then
   NAME=$(jq -r .name config.json)
-  if [ "$NAME" == 'null' ]; then NAME='homekit-proxy'; fi
+  if [ $NAME = null ]; then NAME=homekit-proxy; fi
 
   docker build --tag $NAME .
 
