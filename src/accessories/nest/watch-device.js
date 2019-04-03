@@ -46,16 +46,18 @@ const getClient = token => {
   const createSource = () => {
     const source = new EventSource(`${URL}?auth=${token}`);
 
-    source.on('put', ({data}) => {
+    source.on('put', ({ data }) => {
       try {
-        const {devices: _devices, structures} = JSON.parse(data).data;
-        _.each(_.extend({}, _devices, {structures}), (_devices, device_group) =>
-          _.each(_devices, device => {
-            device = _.extend({}, device, {device_group});
-            const name = device.name_long || device.name;
-            devices[name] = device;
-            _.each(cbs[name], cb => cb(device));
-          })
+        const { devices: _devices, structures } = JSON.parse(data).data;
+        _.each(
+          _.extend({}, _devices, { structures }),
+          (_devices, device_group) =>
+            _.each(_devices, device => {
+              device = _.extend({}, device, { device_group });
+              const name = device.name_long || device.name;
+              devices[name] = device;
+              _.each(cbs[name], cb => cb(device));
+            })
         );
       } catch (er) {
         handleError(er);
@@ -69,7 +71,7 @@ const getClient = token => {
 
   const cbs = {};
   const devices = {};
-  const client = clients[token] = {cbs, close, devices};
+  const client = (clients[token] = { cbs, close, devices });
 
   reset();
 
@@ -78,7 +80,7 @@ const getClient = token => {
 
 process.on('SIGTERM', () => _.invoke(clients, 'close'));
 
-module.exports = ({cb, deviceName, token}) => {
+module.exports = ({ cb, deviceName, token }) => {
   const client = getClient(token);
   if (client.devices[deviceName]) cb(client.devices[deviceName]);
   if (!client.cbs[deviceName]) client.cbs[deviceName] = [];

@@ -3,11 +3,12 @@ const getZwave = require('../zwave/get-zwave');
 const log = require('../../utils/log');
 const rpio = require('rpio');
 const sleep = require('../../utils/sleep');
-
 const {
-  Accessory: {Categories: {GARAGE_DOOR_OPENER}},
-  Characteristic: {CurrentDoorState, TargetDoorState},
-  Service: {GarageDoorOpener}
+  Accessory: {
+    Categories: { GARAGE_DOOR_OPENER }
+  },
+  Characteristic: { CurrentDoorState, TargetDoorState },
+  Service: { GarageDoorOpener }
 } = require('hap-nodejs');
 
 // 0x00 is off (closed), 0xff is on (open).
@@ -34,17 +35,18 @@ module.exports = class extends Base {
 
     this.category = GARAGE_DOOR_OPENER;
 
-    const {gpioPinId, name, zwaveNodeId} = options;
+    const { gpioPinId, name, zwaveNodeId } = options;
     const service = new GarageDoorOpener(name);
 
-    const {client, refreshValue, values} = getZwave(options);
+    const { client, refreshValue, values } = getZwave(options);
     const current = service.getCharacteristic(CurrentDoorState);
     const target = service.getCharacteristic(TargetDoorState);
     let transitionTimeoutId;
     const key = [zwaveNodeId, BINARY_SENSOR_CLASS_ID, 1, 0].join('-');
     const currentValue = values[key] || false;
-    current.on('change', ({oldValue, newValue}) => {
-      log.change(name,
+    current.on('change', ({ oldValue, newValue }) => {
+      log.change(
+        name,
         'Current Door State',
         TO_ENGLISH[oldValue],
         TO_ENGLISH[newValue]
@@ -64,7 +66,7 @@ module.exports = class extends Base {
     });
 
     // Set up TargetDoorState characteristic, handled by sending a gpio signal.
-    target.on('change', ({oldValue, newValue}) =>
+    target.on('change', ({ oldValue, newValue }) =>
       log.change(
         name,
         'Target Door State',

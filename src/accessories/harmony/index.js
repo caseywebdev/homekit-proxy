@@ -5,11 +5,12 @@ const getClient = require('./get-client');
 const log = require('../../utils/log');
 const sendCommand = require('./send-command');
 const sleep = require('../../utils/sleep');
-
 const {
-  Accessory: {Categories: {SWITCH}},
-  Characteristic: {On},
-  Service: {Switch}
+  Accessory: {
+    Categories: { SWITCH }
+  },
+  Characteristic: { On },
+  Service: { Switch }
 } = require('hap-nodejs');
 
 module.exports = class extends Base {
@@ -17,7 +18,7 @@ module.exports = class extends Base {
     super(options);
 
     this.category = SWITCH;
-    const {activityName, commands, deviceName, hubIp, name} = options;
+    const { activityName, commands, deviceName, hubIp, name } = options;
 
     if (!activityName && !(deviceName && commands)) {
       throw new Error(
@@ -31,15 +32,15 @@ module.exports = class extends Base {
     // This accessory should toggle an activity.
     if (activityName) {
       characteristic
-        .on('change', ({oldValue, newValue}) =>
+        .on('change', ({ oldValue, newValue }) =>
           log.change(name, 'on', oldValue, newValue)
         )
         .on('get', async cb => {
           cb(null, characteristic.value);
 
           try {
-            const client = await getClient({hubIp});
-            const {isOn} = await getActivity({activityName, client});
+            const client = await getClient({ hubIp });
+            const { isOn } = await getActivity({ activityName, client });
             characteristic.updateValue(isOn ? 1 : 0);
           } catch (er) {
             log.error(er);
@@ -49,8 +50,11 @@ module.exports = class extends Base {
           cb();
 
           try {
-            const client = await getClient({hubIp});
-            const {activity, isOn} = await getActivity({activityName, client});
+            const client = await getClient({ hubIp });
+            const { activity, isOn } = await getActivity({
+              activityName,
+              client
+            });
             if (turnOn && !isOn) await client.startActivity(activity.id);
             else if (!turnOn && isOn) await client.turnOff();
           } catch (er) {
@@ -58,7 +62,7 @@ module.exports = class extends Base {
           }
         });
 
-    // This accessory should act as a command send button.
+      // This accessory should act as a command send button.
     } else {
       characteristic
         .on('get', cb => cb(null, 0))
@@ -68,10 +72,10 @@ module.exports = class extends Base {
           try {
             log.event(name, 'pressed');
             setTimeout(() => characteristic.updateValue(0), 100);
-            const client = await getClient({hubIp});
+            const client = await getClient({ hubIp });
             for (const command of commands) {
               if (_.isNumber(command)) await sleep(command);
-              else await sendCommand({client, command, deviceName});
+              else await sendCommand({ client, command, deviceName });
             }
           } catch (er) {
             log.error(er);

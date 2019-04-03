@@ -9,15 +9,17 @@ process.on('SIGTERM', () => _.invoke(clients, 'end'));
 
 const clients = {};
 
-module.exports = async ({hubIp}) => {
-  let client = clients[hubIp];
+module.exports = async ({ hubIp }) => {
+  const client = clients[hubIp];
   if (client) return client;
 
   const destroy = _.once(er => {
     if (er) log.error(er);
     clearTimeout(destroyTimeoutId);
     delete clients[hubIp];
-    try { client.end(); } catch (er) {}
+    try {
+      client.end();
+    } catch (er) {}
   });
 
   const destroyTimeoutId = setTimeout(destroy, MAX_CLIENT_DURATION);

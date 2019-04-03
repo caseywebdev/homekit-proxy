@@ -1,6 +1,6 @@
 const _ = require('underscore');
-const {accessories, includes, pincode, port = 10000} = require('../config');
-const {init, uuid} = require('hap-nodejs');
+const { accessories, includes, pincode, port = 10000 } = require('../config');
+const { init, uuid } = require('hap-nodejs');
 const path = require('path');
 
 init(path.resolve('persist'));
@@ -17,13 +17,19 @@ const toUsername = name =>
 
 _.each(_.pairs(accessories), ([name, typeOptions], i) => {
   const [type, options] = _.pairs(typeOptions)[0];
-  const {salt = ''} = options;
+  const { salt = '' } = options;
   const Accessory = require(`./accessories/${type}`);
-  const accessory = new Accessory(_.extend(
-    _.reduce(options.$include, (obj, key) => _.extend(obj, includes[key]), {}),
-    _.omit(options, '$include'),
-    {name}
-  ));
+  const accessory = new Accessory(
+    _.extend(
+      _.reduce(
+        options.$include,
+        (obj, key) => _.extend(obj, includes[key]),
+        {}
+      ),
+      _.omit(options, '$include'),
+      { name }
+    )
+  );
   accessory.publish({
     category: accessory.category,
     pincode,

@@ -1,7 +1,7 @@
-const {Accessory, uuid} = require('hap-nodejs');
+const { Accessory, uuid } = require('hap-nodejs');
 
 module.exports = class extends Accessory {
-  constructor({name}) {
+  constructor({ name }) {
     super(name, uuid.generate(name));
   }
 };

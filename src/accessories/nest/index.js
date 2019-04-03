@@ -9,15 +9,15 @@ module.exports = class extends Base {
   constructor(options) {
     super(options);
 
-    const {deviceName, name, token, type} = options;
-    const {category, characteristics, Service} = types[type];
+    const { deviceName, name, token, type } = options;
+    const { category, characteristics, Service } = types[type];
     let device;
     this.category = category;
     const service = new Service(name);
-    _.each(characteristics, ({cid, cname, toHap, toNest}) => {
+    _.each(characteristics, ({ cid, cname, toHap, toNest }) => {
       const char = service.getCharacteristic(cid);
 
-      char.on('change', ({oldValue, newValue}) =>
+      char.on('change', ({ oldValue, newValue }) =>
         log.change(name, cname, oldValue, newValue)
       );
 
@@ -25,7 +25,7 @@ module.exports = class extends Base {
         watchDevice({
           cb: _device => {
             device = _device;
-            char.updateValue(toHap({device, options}));
+            char.updateValue(toHap({ device, options }));
           },
           deviceName,
           token
@@ -39,8 +39,8 @@ module.exports = class extends Base {
           try {
             if (!device) throw new Error(`Nest Device ${deviceName} not found`);
 
-            const body = toNest({device, options, value});
-            await updateDevice({body, device, token});
+            const body = toNest({ device, options, value });
+            await updateDevice({ body, device, token });
           } catch (er) {
             log.error(er);
           }

@@ -1,4 +1,4 @@
-const {promisify} = require('util');
+const { promisify } = require('util');
 
 const sleep = promisify(setTimeout);
 

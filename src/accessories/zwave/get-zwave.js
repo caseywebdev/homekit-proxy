@@ -8,7 +8,7 @@ const MAX_CHECK_WAIT = 15000;
 
 const byDevice = {};
 
-module.exports = ({device, networkKey: NetworkKey}) => {
+module.exports = ({ device, networkKey: NetworkKey }) => {
   const zwave = byDevice[device];
   if (zwave) return zwave;
 
@@ -33,7 +33,7 @@ module.exports = ({device, networkKey: NetworkKey}) => {
     _.each(pending[nodeId], (value, key) => emitValue(key, value));
   };
 
-  const handleValue = (nodeId, classId, {index, instance, value}) => {
+  const handleValue = (nodeId, classId, { index, instance, value }) => {
     const key = [nodeId, classId, instance, index].join('-');
     if (ready[nodeId]) return emitValue(key, value);
 
@@ -42,7 +42,7 @@ module.exports = ({device, networkKey: NetworkKey}) => {
 
   const getValueId = key => {
     const n = _.map(key.split('-'), n => parseInt(n));
-    return {node_id: n[0], class_id: n[1], instance: n[2], index: n[3]};
+    return { node_id: n[0], class_id: n[1], instance: n[2], index: n[3] };
   };
 
   const getValueSetter = _.memoize(key => {
@@ -57,7 +57,9 @@ module.exports = ({device, networkKey: NetworkKey}) => {
       });
 
       client.removeListener(event, handler);
-      handler = _value => { if (_value === value) done(); };
+      handler = _value => {
+        if (_value === value) done();
+      };
       client.on(event, handler);
 
       const start = Date.now();
@@ -65,10 +67,12 @@ module.exports = ({device, networkKey: NetworkKey}) => {
         if (values[key] === value) return done();
 
         if (Date.now() - start > MAX_CHECK_WAIT) {
-          return done(new Error(
-            `Waited over ${MAX_CHECK_WAIT / 1000}s for ${key} to be set to ` +
-            `${value}, but it is currently ${values[key]}.`
-          ));
+          return done(
+            new Error(
+              `Waited over ${MAX_CHECK_WAIT / 1000}s for ${key} to be set to ` +
+                `${value}, but it is currently ${values[key]}.`
+            )
+          );
         }
 
         refreshValue(key);
@@ -107,9 +111,9 @@ module.exports = ({device, networkKey: NetworkKey}) => {
     .on('value added', handleValue)
     .on('value changed', handleValue)
     .connect(device);
-  return byDevice[device] = {client, refreshValue, setValue, values};
+  return (byDevice[device] = { client, refreshValue, setValue, values });
 };
 
 process.on('SIGTERM', () => {
-  _.each(byDevice, ({client}, device) => client.disconnect(device));
+  _.each(byDevice, ({ client }, device) => client.disconnect(device));
 });
