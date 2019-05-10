@@ -1,4 +1,4 @@
-FROM node:11.14.0-alpine
+FROM node:11.15.0-alpine
 
 CMD ["bin/run"]
 
