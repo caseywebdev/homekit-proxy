@@ -14,7 +14,7 @@ RUN apk add --no-cache \
       && \
     mkdir -p /usr/local/src/open-zwave && \
     curl -fLsS \
-      https://api.github.com/repos/OpenZWave/open-zwave/tarball/master | \
+      https://api.github.com/repos/OpenZWave/open-zwave/tarball/75bcd082e478fc08bff872e62fc8122bae14eb86 | \
       tar xz -C /usr/local/src/open-zwave --strip-components 1 && \
     cd /usr/local/src/open-zwave && \
     make && \
